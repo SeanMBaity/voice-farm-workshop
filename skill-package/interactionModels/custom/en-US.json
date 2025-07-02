@@ -1,0 +1,212 @@
+{
+  "interactionModel": {
+    "languageModel": {
+      "invocationName": "voice farm",
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "LaunchRequestIntent",
+          "samples": [
+            "open voice farm",
+            "start voice farm",
+            "play voice farm"
+          ]
+        },
+        {
+          "name": "PlantCropIntent",
+          "slots": [
+            {
+              "name": "CropType",
+              "type": "CropTypeSlot"
+            }
+          ],
+          "samples": [
+            "plant {CropType}",
+            "plant some {CropType}",
+            "I want to plant {CropType}",
+            "can I plant {CropType}",
+            "plant a {CropType}",
+            "grow {CropType}",
+            "start growing {CropType}",
+            "put in {CropType}",
+            "add {CropType} to my farm"
+          ]
+        },
+        {
+          "name": "WaterCropsIntent",
+          "slots": [
+            {
+              "name": "CropType",
+              "type": "CropTypeSlot"
+            }
+          ],
+          "samples": [
+            "water my crops",
+            "water the crops",
+            "water my {CropType}",
+            "water the {CropType}",
+            "give water to my crops",
+            "give water to the {CropType}",
+            "water my plants",
+            "water my farm",
+            "hydrate my crops",
+            "sprinkle water on my crops"
+          ]
+        },
+        {
+          "name": "HarvestCropsIntent",
+          "slots": [
+            {
+              "name": "CropType",
+              "type": "CropTypeSlot"
+            }
+          ],
+          "samples": [
+            "harvest my crops",
+            "harvest the crops",
+            "harvest my {CropType}",
+            "harvest the {CropType}",
+            "pick my crops",
+            "pick the {CropType}",
+            "collect my harvest",
+            "gather my crops",
+            "reap my crops",
+            "collect my {CropType}"
+          ]
+        },
+        {
+          "name": "CheckFarmIntent",
+          "samples": [
+            "check my farm",
+            "how is my farm",
+            "show me my farm",
+            "what's growing",
+            "farm status",
+            "how are my crops",
+            "what's ready",
+            "farm report",
+            "check my crops",
+            "what's happening on my farm"
+          ]
+        },
+        {
+          "name": "GetHelpIntent",
+          "samples": [
+            "what can I do",
+            "what are my options",
+            "help me",
+            "how do I play",
+            "what commands can I use",
+            "how does this work",
+            "what can I say",
+            "give me help"
+          ]
+        }
+      ],
+      "types": [
+        {
+          "name": "CropTypeSlot",
+          "values": [
+            {
+              "name": {
+                "value": "tomatoes",
+                "synonyms": [
+                  "tomato",
+                  "red tomatoes",
+                  "cherry tomatoes"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "carrots",
+                "synonyms": [
+                  "carrot",
+                  "orange carrots",
+                  "baby carrots"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "corn",
+                "synonyms": [
+                  "sweet corn",
+                  "corn kernels",
+                  "maize"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "strawberries",
+                "synonyms": [
+                  "strawberry",
+                  "red strawberries",
+                  "sweet strawberries"
+                ]
+              }
+            },
+            {
+              "name": {
+                "value": "lettuce",
+                "synonyms": [
+                  "green lettuce",
+                  "salad",
+                  "leafy greens"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "dialog": {
+      "intents": [
+        {
+          "name": "PlantCropIntent",
+          "confirmationRequired": false,
+          "prompts": {},
+          "slots": [
+            {
+              "name": "CropType",
+              "type": "CropTypeSlot",
+              "confirmationRequired": false,
+              "elicitationRequired": true,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1097746708904.1033781670017"
+              }
+            }
+          ]
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "prompts": [
+      {
+        "id": "Elicit.Slot.1097746708904.1033781670017",
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "What would you like to plant? You can choose from tomatoes, carrots, corn, strawberries, or lettuce."
+          }
+        ]
+      }
+    ]
+  }
+} 

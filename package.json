@@ -1,0 +1,35 @@
+{
+  "name": "voice-farm-game",
+  "version": "1.0.0",
+  "description": "A cozy voice-first farming game for Amazon Alexa devices",
+  "main": "lambda/index.js",
+  "scripts": {
+    "test": "jest",
+    "deploy": "ask deploy",
+    "invoke": "ask dialog --locale en-US",
+    "start": "node lambda/index.js"
+  },
+  "keywords": [
+    "alexa",
+    "voice",
+    "farming",
+    "game",
+    "echo-show",
+    "apl"
+  ],
+  "author": "Sean Baity",
+  "license": "MIT",
+  "dependencies": {
+    "ask-sdk-core": "^2.13.0",
+    "ask-sdk-model": "^1.29.0",
+    "ask-sdk-dynamodb-persistence-adapter": "^2.13.0",
+    "aws-sdk": "^2.1691.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "ask-cli": "^2.30.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 

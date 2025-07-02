@@ -1,0 +1,68 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-US": {
+          "summary": "A cozy voice-first farming game",
+          "examplePhrases": [
+            "Alexa, open Voice Farm",
+            "Alexa, ask Voice Farm to plant tomatoes",
+            "Alexa, tell Voice Farm to water my crops"
+          ],
+          "keywords": [
+            "farming",
+            "game",
+            "casual",
+            "cozy",
+            "crops",
+            "garden"
+          ],
+          "name": "Voice Farm Game",
+          "description": "A relaxing farming game where you plant, water, and harvest crops using your voice. Perfect for daily relaxation sessions on Echo Show and other Alexa devices. Grow your virtual farm, unlock new crops, and enjoy the cozy farming experience designed for women aged 30-65.",
+          "largeIconUri": "https://voice-farm-assets.s3.amazonaws.com/icons/large-icon.png",
+          "smallIconUri": "https://voice-farm-assets.s3.amazonaws.com/icons/small-icon.png"
+        }
+      },
+      "isAvailableWorldwide": false,
+      "testingInstructions": "Test by saying 'Alexa, open Voice Farm' then try planting crops with 'plant tomatoes' or 'plant carrots'.",
+      "category": "GAMES",
+      "distributionCountries": ["US", "CA", "GB", "AU"]
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "uri": "arn:aws:lambda:us-east-1:123456789012:function:voice-farm-game"
+        },
+        "interfaces": [
+          {
+            "type": "ALEXA_PRESENTATION_APL"
+          },
+          {
+            "type": "ALEXA_PRESENTATION_APLA"
+          }
+        ],
+        "regions": {
+          "NA": {
+            "endpoint": {
+              "uri": "arn:aws:lambda:us-east-1:123456789012:function:voice-farm-game"
+            }
+          }
+        }
+      }
+    },
+    "manifestVersion": "1.0",
+    "privacyAndCompliance": {
+      "allowsPurchases": false,
+      "usesPersonalInfo": false,
+      "isChildDirected": false,
+      "isExportCompliant": true,
+      "containsAds": false,
+      "locales": {
+        "en-US": {
+          "privacyPolicyUrl": "https://voice-farm-game.com/privacy",
+          "termsOfUseUrl": "https://voice-farm-game.com/terms"
+        }
+      }
+    }
+  }
+} 
