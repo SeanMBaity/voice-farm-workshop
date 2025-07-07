@@ -3,8 +3,7 @@
 class VoiceFarmGame {
     constructor() {
         this.selectedCrop = 'tomatoes';
-        this.farm = {
-            plots: Array(25).fill(null), // 5x5 grid
+        this.playerStats = {
             level: 1,
             xp: 0,
             totalHarvests: 0
@@ -60,6 +59,8 @@ class VoiceFarmGame {
             levelup: null
         };
         
+        this.farmGrid = null;
+        
         this.init();
     }
     
@@ -77,18 +78,17 @@ class VoiceFarmGame {
     }
     
     createFarmGrid() {
-        const farmGrid = document.getElementById('farm-grid');
-        farmGrid.innerHTML = '';
+        const farmGridElement = document.getElementById('farm-grid');
+        this.farmGrid = new FarmGrid(farmGridElement, this.cropConfig);
         
-        for (let i = 0; i < 25; i++) {
-            const plot = document.createElement('div');
-            plot.className = 'farm-plot empty';
-            plot.dataset.plotIndex = i;
-            plot.innerHTML = '<div class="crop-icon">🌱</div>';
-            
-            plot.addEventListener('click', () => this.handlePlotClick(i));
-            farmGrid.appendChild(plot);
-        }
+        // Set up event handlers
+        this.farmGrid.setPlotActionHandler((plotIndex, plotState) => {
+            this.handlePlotClick(plotIndex, plotState);
+        });
+        
+        this.farmGrid.setMessageHandler((message, type) => {
+            this.addMessage(message, type);
+        });
     }
     
     setupEventListeners() {
@@ -111,205 +111,105 @@ class VoiceFarmGame {
         document.querySelector('.crop-btn[data-crop="tomatoes"]').classList.add('selected');
     }
     
-    handlePlotClick(plotIndex) {
-        const plot = this.farm.plots[plotIndex];
-        
-        if (!plot) {
+    handlePlotClick(plotIndex, plotState) {
+        if (plotState === 'empty') {
             // Empty plot - plant crop
             this.plantCrop(plotIndex);
-        } else if (plot.status === 'planted' || plot.status === 'growing') {
+        } else if (plotState === 'planted' || plotState === 'growing') {
             // Water individual crop
             this.waterCrop(plotIndex);
-        } else if (plot.status === 'ready') {
+        } else if (plotState === 'ready') {
             // Harvest ready crop
             this.harvestCrop(plotIndex);
         }
     }
     
     plantCrop(plotIndex) {
-        const cropType = this.selectedCrop;
-        const config = this.cropConfig[cropType];
+        const success = this.farmGrid.plantCrop(plotIndex, this.selectedCrop);
         
-        const crop = {
-            type: cropType,
-            status: 'planted',
-            plantedAt: Date.now(),
-            wateredAt: null,
-            readyAt: Date.now() + config.growthTime
-        };
-        
-        this.farm.plots[plotIndex] = crop;
-        this.playSound('plant');
-        this.addMessage(`Planted ${config.name}! 🌱 Water it to help it grow!`, 'plant');
-        this.updatePlotDisplay(plotIndex);
-        this.saveGameState();
+        if (success) {
+            this.playSound('plant');
+            this.saveGameState();
+        }
     }
     
     waterCrop(plotIndex) {
-        const crop = this.farm.plots[plotIndex];
-        if (!crop || crop.status === 'ready' || crop.status === 'harvested') return;
+        const success = this.farmGrid.waterCrop(plotIndex);
         
-        crop.wateredAt = Date.now();
-        crop.status = 'growing';
-        
-        this.playSound('water');
-        this.addMessage(`Watered your ${this.cropConfig[crop.type].name}! 💧 It's growing beautifully!`, 'water');
-        this.updatePlotDisplay(plotIndex);
-        this.saveGameState();
+        if (success) {
+            this.playSound('water');
+            this.saveGameState();
+        }
     }
     
     waterAllCrops() {
-        let wateredCount = 0;
-        
-        this.farm.plots.forEach((crop, index) => {
-            if (crop && (crop.status === 'planted' || crop.status === 'growing')) {
-                crop.wateredAt = Date.now();
-                crop.status = 'growing';
-                this.updatePlotDisplay(index);
-                wateredCount++;
-            }
-        });
+        const wateredCount = this.farmGrid.waterAllCrops();
         
         if (wateredCount > 0) {
             this.playSound('water');
-            this.addMessage(`Watered ${wateredCount} crops! 💧 Your farm is thriving!`, 'water');
             this.saveGameState();
-        } else {
-            this.addMessage(`No crops need watering right now! Plant some seeds first! 🌱`, 'water');
         }
     }
     
     harvestCrop(plotIndex) {
-        const crop = this.farm.plots[plotIndex];
-        if (!crop || crop.status !== 'ready') return;
+        const result = this.farmGrid.harvestCrop(plotIndex);
         
-        const config = this.cropConfig[crop.type];
-        crop.status = 'harvested';
-        
-        // Award XP
-        this.farm.xp += config.xpReward;
-        this.farm.totalHarvests++;
-        
-        // Check for level up
-        const newLevel = Math.floor(this.farm.xp / 50) + 1;
-        const leveledUp = newLevel > this.farm.level;
-        this.farm.level = newLevel;
-        
-        this.playSound('harvest');
-        this.addMessage(`Harvested ${config.name}! 🌾 Gained ${config.xpReward} XP!`, 'harvest');
-        
-        if (leveledUp) {
-            this.playSound('levelup');
-            this.addMessage(`🎉 Level up! You're now level ${this.farm.level}! 🎉`, 'levelup');
-        }
-        
-        this.updatePlotDisplay(plotIndex);
-        this.updateUI();
-        this.saveGameState();
-    }
-    
-    harvestAllCrops() {
-        let harvestedCount = 0;
-        let totalXP = 0;
-        
-        this.farm.plots.forEach((crop, index) => {
-            if (crop && crop.status === 'ready') {
-                const config = this.cropConfig[crop.type];
-                crop.status = 'harvested';
-                totalXP += config.xpReward;
-                harvestedCount++;
-                this.updatePlotDisplay(index);
-            }
-        });
-        
-        if (harvestedCount > 0) {
-            const oldLevel = this.farm.level;
-            this.farm.xp += totalXP;
-            this.farm.totalHarvests += harvestedCount;
-            this.farm.level = Math.floor(this.farm.xp / 50) + 1;
+        if (result) {
+            // Award XP
+            this.playerStats.xp += result.xp;
+            this.playerStats.totalHarvests++;
+            
+            // Check for level up
+            const newLevel = Math.floor(this.playerStats.xp / 50) + 1;
+            const leveledUp = newLevel > this.playerStats.level;
+            this.playerStats.level = newLevel;
             
             this.playSound('harvest');
-            this.addMessage(`Harvested ${harvestedCount} crops! 🌾 Gained ${totalXP} XP!`, 'harvest');
             
-            if (this.farm.level > oldLevel) {
+            if (leveledUp) {
                 this.playSound('levelup');
-                this.addMessage(`🎉 Level up! You're now level ${this.farm.level}! 🎉`, 'levelup');
+                this.addMessage(`🎉 Level up! You're now level ${this.playerStats.level}! 🎉`, 'levelup');
             }
             
             this.updateUI();
             this.saveGameState();
-        } else {
-            this.addMessage(`No crops are ready to harvest yet! Be patient! ⏰`, 'harvest');
+        }
+    }
+    
+    harvestAllCrops() {
+        const result = this.farmGrid.harvestAllCrops();
+        
+        if (result.count > 0) {
+            const oldLevel = this.playerStats.level;
+            this.playerStats.xp += result.xp;
+            this.playerStats.totalHarvests += result.count;
+            this.playerStats.level = Math.floor(this.playerStats.xp / 50) + 1;
+            
+            this.playSound('harvest');
+            
+            if (this.playerStats.level > oldLevel) {
+                this.playSound('levelup');
+                this.addMessage(`🎉 Level up! You're now level ${this.playerStats.level}! 🎉`, 'levelup');
+            }
+            
+            this.updateUI();
+            this.saveGameState();
         }
     }
     
     clearHarvestedCrops() {
-        let clearedCount = 0;
-        
-        this.farm.plots.forEach((crop, index) => {
-            if (crop && crop.status === 'harvested') {
-                this.farm.plots[index] = null;
-                this.updatePlotDisplay(index);
-                clearedCount++;
-            }
-        });
+        const clearedCount = this.farmGrid.clearHarvestedCrops();
         
         if (clearedCount > 0) {
-            this.addMessage(`Cleared ${clearedCount} harvested plots! Ready for new crops! 🧹`, 'harvest');
             this.saveGameState();
-        } else {
-            this.addMessage(`No harvested crops to clear! 🧹`, 'harvest');
         }
     }
     
-    updatePlotDisplay(plotIndex) {
-        const plotElement = document.querySelector(`[data-plot-index="${plotIndex}"]`);
-        const crop = this.farm.plots[plotIndex];
-        
-        if (!crop) {
-            // Empty plot
-            plotElement.className = 'farm-plot empty';
-            plotElement.innerHTML = '<div class="crop-icon">🌱</div>';
-        } else {
-            const config = this.cropConfig[crop.type];
-            let icon, className, timer = '';
-            
-            switch (crop.status) {
-                case 'planted':
-                    icon = config.plantedIcon;
-                    className = 'farm-plot planted';
-                    timer = 'Needs water';
-                    break;
-                case 'growing':
-                    icon = config.growingIcon;
-                    className = 'farm-plot growing';
-                    const timeLeft = Math.max(0, crop.readyAt - Date.now());
-                    timer = timeLeft > 0 ? `${Math.ceil(timeLeft / 1000)}s` : 'Ready!';
-                    break;
-                case 'ready':
-                    icon = config.icon;
-                    className = 'farm-plot ready';
-                    timer = 'Ready!';
-                    break;
-                case 'harvested':
-                    icon = '✅';
-                    className = 'farm-plot harvested';
-                    timer = 'Harvested';
-                    break;
-            }
-            
-            plotElement.className = className;
-            plotElement.innerHTML = `
-                <div class="crop-icon">${icon}</div>
-                <div class="crop-timer">${timer}</div>
-            `;
-        }
-    }
     
     updateUI() {
-        document.getElementById('player-level').textContent = this.farm.level;
-        document.getElementById('player-xp').textContent = this.farm.xp;
-        document.getElementById('total-harvests').textContent = this.farm.totalHarvests;
+        document.getElementById('player-level').textContent = this.playerStats.level;
+        document.getElementById('player-xp').textContent = this.playerStats.xp;
+        document.getElementById('total-harvests').textContent = this.playerStats.totalHarvests;
     }
     
     addMessage(text, type = 'welcome') {
@@ -330,26 +230,9 @@ class VoiceFarmGame {
     
     startGameLoop() {
         setInterval(() => {
-            let updated = false;
-            
-            this.farm.plots.forEach((crop, index) => {
-                if (crop && crop.status === 'growing' && Date.now() >= crop.readyAt) {
-                    crop.status = 'ready';
-                    this.updatePlotDisplay(index);
-                    updated = true;
-                }
-            });
-            
-            // Update timers for growing crops
-            this.farm.plots.forEach((crop, index) => {
-                if (crop && crop.status === 'growing') {
-                    this.updatePlotDisplay(index);
-                }
-            });
-            
-            if (updated) {
-                this.addMessage(`Some crops are ready to harvest! 🌾 Click them or use "Harvest All"!`, 'harvest');
-            }
+            // Update crop growth and timers
+            this.farmGrid.updateGrowth();
+            this.farmGrid.updateTimers();
         }, 1000); // Update every second
     }
     
@@ -375,8 +258,9 @@ class VoiceFarmGame {
     
     saveGameState() {
         const gameState = {
-            farm: this.farm,
-            selectedCrop: this.selectedCrop
+            playerStats: this.playerStats,
+            selectedCrop: this.selectedCrop,
+            farmData: this.farmGrid.getAllPlotData()
         };
         localStorage.setItem('voiceFarmGame', JSON.stringify(gameState));
     }
@@ -386,12 +270,16 @@ class VoiceFarmGame {
         if (saved) {
             try {
                 const gameState = JSON.parse(saved);
-                this.farm = { ...this.farm, ...gameState.farm };
+                this.playerStats = { ...this.playerStats, ...gameState.playerStats };
                 this.selectedCrop = gameState.selectedCrop || 'tomatoes';
+                
+                // Restore farm data
+                if (gameState.farmData) {
+                    this.farmGrid.restoreFromData(gameState.farmData);
+                }
                 
                 // Update UI
                 this.updateUI();
-                this.farm.plots.forEach((_, index) => this.updatePlotDisplay(index));
                 
                 // Select the saved crop
                 document.querySelectorAll('.crop-btn').forEach(btn => {
@@ -406,8 +294,7 @@ class VoiceFarmGame {
     }
     
     resetGame() {
-        this.farm = {
-            plots: Array(25).fill(null),
+        this.playerStats = {
             level: 1,
             xp: 0,
             totalHarvests: 0
@@ -415,8 +302,8 @@ class VoiceFarmGame {
         this.selectedCrop = 'tomatoes';
         localStorage.removeItem('voiceFarmGame');
         
+        this.farmGrid.reset();
         this.updateUI();
-        this.farm.plots.forEach((_, index) => this.updatePlotDisplay(index));
         
         document.querySelectorAll('.crop-btn').forEach(btn => {
             btn.classList.toggle('selected', btn.dataset.crop === 'tomatoes');

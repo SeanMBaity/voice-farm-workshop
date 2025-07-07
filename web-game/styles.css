@@ -118,8 +118,14 @@ body {
 }
 
 .farm-plot:hover {
-    transform: translateY(-3px);
+    transform: translateY(-3px) scale(1.02);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1;
+}
+
+.farm-plot:active {
+    transform: translateY(-1px) scale(0.98);
+    transition: transform 0.1s ease;
 }
 
 .farm-plot.empty {
@@ -404,20 +410,65 @@ body {
     
     .farm-grid {
         grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
+        gap: 12px;
     }
     
     .farm-plot {
-        width: 60px;
-        height: 60px;
+        width: 65px;
+        height: 65px;
+        /* Enhanced touch targets for mobile */
+        min-height: 44px;
+        min-width: 44px;
     }
     
     .crop-icon {
-        font-size: 1.5rem;
+        font-size: 1.6rem;
     }
     
     .crop-buttons {
         grid-template-columns: 1fr;
+        gap: 12px;
+    }
+    
+    .crop-btn {
+        min-height: 44px; /* Touch-friendly size */
+        padding: 12px;
+    }
+    
+    .action-btn {
+        min-height: 44px; /* Touch-friendly size */
+        font-size: 1rem;
+    }
+    
+    /* Reduce hint sensitivity on mobile */
+    .farm-plot:hover .action-hint {
+        display: none;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    .farm-plot {
+        /* Larger touch targets */
+        min-width: 48px;
+        min-height: 48px;
+    }
+    
+    .farm-plot:hover {
+        /* Disable hover effects on touch devices */
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .farm-plot:active {
+        /* Enhanced tap feedback */
+        transform: scale(0.95);
+        background-color: rgba(144, 238, 144, 0.3);
+    }
+    
+    /* Hide hover hints on touch devices */
+    .action-hint {
+        display: none !important;
     }
 }
 
@@ -430,4 +481,9 @@ body {
 @keyframes pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.5; }
+}
+
+@keyframes fadeInHint {
+    from { opacity: 0; transform: translateX(-50%) translateY(5px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
 } 
