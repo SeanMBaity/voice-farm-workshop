@@ -7,6 +7,12 @@ class VoiceFarmGame {
         // Initialize new management systems
         this.cropManager = new CropManager();
         this.resourceManager = new ResourceManager();
+        this.timerManager = new TimerManager();
+        this.storageManager = new StorageManager({
+            storageKey: 'voiceFarmGame',
+            autoSaveInterval: 30000, // 30 seconds
+            maxBackups: 3
+        });
         this.farmGrid = null;
         
         this.sounds = {
@@ -22,16 +28,55 @@ class VoiceFarmGame {
     }
     
     init() {
+        this.setupManagers();
         this.createFarmGrid();
         this.setupEventListeners();
         this.updateUI();
-        this.startGameLoop();
+        this.startAdvancedGameLoop();
         this.loadSounds();
         
         // Load saved game state
         this.loadGameState();
         
         console.log('🌾 Voice Farm Game initialized!');
+    }
+    
+    setupManagers() {
+        // Set up TimerManager
+        this.timerManager.setTickHandler((deltaTime, now) => {
+            this.onGameTick(deltaTime, now);
+        });
+        
+        this.timerManager.setVisibilityHandler((isVisible, wasVisible) => {
+            this.onVisibilityChange(isVisible, wasVisible);
+        });
+        
+        this.timerManager.setOfflineProgressHandler((offlineTime) => {
+            this.onOfflineProgress(offlineTime);
+        });
+        
+        // Set up StorageManager
+        this.storageManager.gatherGameData = () => {
+            return {
+                resources: this.resourceManager.exportData(),
+                selectedCrop: this.selectedCrop,
+                farmData: this.farmGrid ? this.farmGrid.getAllPlotData() : [],
+                timers: this.timerManager.exportTimers(),
+                version: '3.0'
+            };
+        };
+        
+        this.storageManager.setAutoSaveHandler((gameData) => {
+            this.addMessage('Game auto-saved 💾', 'system');
+        });
+        
+        this.storageManager.setErrorHandler((operation, error) => {
+            this.addMessage(`Save/load error: ${error.message}`, 'error');
+        });
+        
+        // Start the systems
+        this.timerManager.start();
+        this.storageManager.enableAutoSave();
     }
     
     createFarmGrid() {
@@ -86,6 +131,7 @@ class VoiceFarmGame {
         document.getElementById('water-all-btn').addEventListener('click', () => this.waterAllCrops());
         document.getElementById('harvest-all-btn').addEventListener('click', () => this.harvestAllCrops());
         document.getElementById('clear-farm-btn').addEventListener('click', () => this.clearHarvestedCrops());
+        document.getElementById('save-game-btn').addEventListener('click', () => this.saveGameState(true));
     }
     
     createCropButtons() {
@@ -182,7 +228,7 @@ class VoiceFarmGame {
             this.resourceManager.spendResource('money', crop.seedCost, `${crop.name}_seeds`);
             this.playSound('plant');
             this.addMessage(`Planted ${crop.name}! 🌱 Spent ${crop.seedCost} coins on seeds.`, 'plant');
-            this.saveGameState();
+            this.saveGameState(false); // Auto-save
         }
     }
     
@@ -191,7 +237,7 @@ class VoiceFarmGame {
         
         if (success) {
             this.playSound('water');
-            this.saveGameState();
+            this.saveGameState(false); // Auto-save
         }
     }
     
@@ -200,7 +246,7 @@ class VoiceFarmGame {
         
         if (wateredCount > 0) {
             this.playSound('water');
-            this.saveGameState();
+            this.saveGameState(false); // Auto-save
         }
     }
     
@@ -220,7 +266,7 @@ class VoiceFarmGame {
                 
                 this.playSound('harvest');
                 this.addMessage(`Harvested ${crop.name}! 🌾 Earned ${crop.sellPrice} coins and ${result.xp} XP!`, 'harvest');
-                this.saveGameState();
+                this.saveGameState(false); // Auto-save
             }
         }
     }
@@ -260,7 +306,7 @@ class VoiceFarmGame {
             
             this.playSound('harvest');
             this.addMessage(`Harvested ${harvestedCount} crops! 🌾 Earned ${totalMoney} coins and ${totalXP} XP!`, 'harvest');
-            this.saveGameState();
+            this.saveGameState(false); // Auto-save
         }
     }
     
@@ -268,7 +314,7 @@ class VoiceFarmGame {
         const clearedCount = this.farmGrid.clearHarvestedCrops();
         
         if (clearedCount > 0) {
-            this.saveGameState();
+            this.saveGameState(false); // Auto-save
         }
     }
     
@@ -333,12 +379,38 @@ class VoiceFarmGame {
         }
     }
     
-    startGameLoop() {
-        setInterval(() => {
-            // Update crop growth and timers
+    startAdvancedGameLoop() {
+        // The TimerManager now handles the main game loop
+        // We just need to start it (already done in setupManagers)
+        console.log('⏰ Advanced game loop started with TimerManager');
+    }
+    
+    onGameTick(deltaTime, now) {
+        // This is called every second by the TimerManager
+        this.farmGrid.updateGrowth();
+        this.farmGrid.updateTimers();
+    }
+    
+    onVisibilityChange(isVisible, wasVisible) {
+        if (!wasVisible && isVisible) {
+            this.addMessage('Welcome back! Your farm continued growing! 🌱', 'system');
+        } else if (wasVisible && !isVisible) {
+            this.addMessage('Farm will continue growing while you\'re away! 🌾', 'system');
+        }
+    }
+    
+    onOfflineProgress(offlineTime) {
+        const offlineMinutes = Math.floor(offlineTime / 60000);
+        if (offlineMinutes > 1) {
+            this.addMessage(`You were away for ${offlineMinutes} minutes. Your crops kept growing! 🕐`, 'system');
+        }
+        
+        // The TimerManager automatically handles offline progress for crop timers
+        // We just need to update the display
+        setTimeout(() => {
             this.farmGrid.updateGrowth();
             this.farmGrid.updateTimers();
-        }, 1000); // Update every second
+        }, 100);
     }
     
     loadSounds() {
@@ -361,42 +433,50 @@ class VoiceFarmGame {
         // }
     }
     
-    saveGameState() {
-        const gameState = {
-            resources: this.resourceManager.exportData(),
-            selectedCrop: this.selectedCrop,
-            farmData: this.farmGrid.getAllPlotData(),
-            version: '3.0' // Track version for future migrations
-        };
-        localStorage.setItem('voiceFarmGame', JSON.stringify(gameState));
+    async saveGameState(isManual = true) {
+        try {
+            const gameData = {
+                resources: this.resourceManager.exportData(),
+                selectedCrop: this.selectedCrop,
+                farmData: this.farmGrid.getAllPlotData(),
+                timers: this.timerManager.exportTimers(),
+                version: '3.0'
+            };
+            
+            await this.storageManager.save(gameData, { isAutoSave: !isManual });
+            
+            if (isManual) {
+                this.addMessage('Game saved successfully! 💾', 'system');
+            }
+            
+        } catch (error) {
+            console.error('Failed to save game:', error);
+            this.addMessage('Failed to save game! 😞', 'error');
+        }
     }
     
-    loadGameState() {
-        const saved = localStorage.getItem('voiceFarmGame');
-        if (saved) {
-            try {
-                const gameState = JSON.parse(saved);
+    async loadGameState() {
+        try {
+            const savePackage = await this.storageManager.load();
+            
+            if (savePackage && savePackage.gameData) {
+                const gameData = savePackage.gameData;
                 
                 // Import resource data
-                if (gameState.resources) {
-                    this.resourceManager.importData(gameState.resources);
-                } else if (gameState.playerStats) {
-                    // Migrate old save format
-                    this.resourceManager.importData({
-                        resources: {
-                            money: 50, // Default starting money
-                            level: gameState.playerStats.level || 1,
-                            xp: gameState.playerStats.xp || 0,
-                            totalHarvests: gameState.playerStats.totalHarvests || 0
-                        }
-                    });
+                if (gameData.resources) {
+                    this.resourceManager.importData(gameData.resources);
                 }
                 
-                this.selectedCrop = gameState.selectedCrop || 'wheat';
+                this.selectedCrop = gameData.selectedCrop || 'wheat';
                 
                 // Restore farm data
-                if (gameState.farmData) {
-                    this.farmGrid.restoreFromData(gameState.farmData);
+                if (gameData.farmData) {
+                    this.farmGrid.restoreFromData(gameData.farmData);
+                }
+                
+                // Restore timers
+                if (gameData.timers) {
+                    this.timerManager.importTimers(gameData.timers);
                 }
                 
                 // Update UI and crop buttons
@@ -410,17 +490,34 @@ class VoiceFarmGame {
                     });
                 }, 100);
                 
-                this.addMessage(`Welcome back! Your farm has been restored! 🌾`, 'welcome');
-            } catch (e) {
-                console.error('Failed to load game state:', e);
-                this.addMessage(`Failed to load save data. Starting fresh! 🌱`, 'welcome');
+                const timeAway = Date.now() - savePackage.timestamp;
+                const minutesAway = Math.floor(timeAway / 60000);
+                
+                if (minutesAway > 5) {
+                    this.addMessage(`Welcome back! You were away for ${minutesAway} minutes. Your farm kept growing! 🌾`, 'welcome');
+                } else {
+                    this.addMessage(`Welcome back! Your farm has been restored! 🌾`, 'welcome');
+                }
+                
+            } else {
+                this.addMessage(`Welcome to your new farm! Start by planting some wheat! 🌱`, 'welcome');
             }
+            
+        } catch (error) {
+            console.error('Failed to load game state:', error);
+            this.addMessage(`Failed to load save data. Starting fresh! 🌱`, 'error');
         }
     }
     
-    resetGame() {
+    async resetGame() {
+        // Stop auto-save during reset
+        this.storageManager.disableAutoSave();
+        
         this.resourceManager.reset();
+        this.timerManager.clearAllTimers();
         this.selectedCrop = 'wheat';
+        
+        // Clear storage
         localStorage.removeItem('voiceFarmGame');
         
         this.farmGrid.reset();
@@ -432,6 +529,9 @@ class VoiceFarmGame {
                 btn.classList.toggle('selected', btn.dataset.crop === 'wheat');
             });
         }, 100);
+        
+        // Re-enable auto-save
+        this.storageManager.enableAutoSave();
         
         this.addMessage(`Farm reset! Start your cozy farming journey! 🌱`, 'welcome');
     }
