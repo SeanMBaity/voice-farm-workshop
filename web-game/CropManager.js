@@ -14,7 +14,7 @@ class CropManager {
                 seedCost: 5,
                 sellPrice: 12,
                 xpReward: 8,
-                growthTime: 5000, // 5 seconds for demo (5 hours in real game)
+                growthTime: 15000, // 15 seconds for demo (5 hours in real game)
                 waterNeeded: true,
                 rarity: 'common',
                 unlockLevel: 1
@@ -30,7 +30,7 @@ class CropManager {
                 seedCost: 8,
                 sellPrice: 18,
                 xpReward: 10,
-                growthTime: 4000, // 4 seconds for demo
+                growthTime: 12000, // 12 seconds for demo
                 waterNeeded: true,
                 rarity: 'common',
                 unlockLevel: 1
@@ -46,7 +46,7 @@ class CropManager {
                 seedCost: 6,
                 sellPrice: 14,
                 xpReward: 8,
-                growthTime: 3000, // 3 seconds for demo
+                growthTime: 9000, // 9 seconds for demo
                 waterNeeded: true,
                 rarity: 'common',
                 unlockLevel: 1
@@ -62,7 +62,7 @@ class CropManager {
                 seedCost: 12,
                 sellPrice: 25,
                 xpReward: 15,
-                growthTime: 6000, // 6 seconds for demo
+                growthTime: 18000, // 18 seconds for demo
                 waterNeeded: true,
                 rarity: 'uncommon',
                 unlockLevel: 3
@@ -78,7 +78,7 @@ class CropManager {
                 seedCost: 15,
                 sellPrice: 30,
                 xpReward: 12,
-                growthTime: 5000, // 5 seconds for demo
+                growthTime: 15000, // 15 seconds for demo
                 waterNeeded: true,
                 rarity: 'uncommon',
                 unlockLevel: 2
@@ -94,7 +94,7 @@ class CropManager {
                 seedCost: 3,
                 sellPrice: 8,
                 xpReward: 6,
-                growthTime: 2000, // 2 seconds for demo
+                growthTime: 6000, // 6 seconds for demo
                 waterNeeded: true,
                 rarity: 'common',
                 unlockLevel: 1
@@ -110,7 +110,7 @@ class CropManager {
                 seedCost: 20,
                 sellPrice: 45,
                 xpReward: 20,
-                growthTime: 8000, // 8 seconds for demo
+                growthTime: 24000, // 24 seconds for demo
                 waterNeeded: true,
                 rarity: 'rare',
                 unlockLevel: 5
@@ -126,7 +126,7 @@ class CropManager {
                 seedCost: 10,
                 sellPrice: 22,
                 xpReward: 14,
-                growthTime: 7000, // 7 seconds for demo
+                growthTime: 21000, // 21 seconds for demo
                 waterNeeded: true,
                 rarity: 'uncommon',
                 unlockLevel: 4

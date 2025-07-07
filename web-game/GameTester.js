@@ -160,8 +160,8 @@ class GameTester {
         emptyPlot.click();
         await this.sleep(this.testSpeed);
         
-        // Wait for crop to grow (wheat grows in 5 seconds)
-        await this.sleep(6000);
+        // Wait for crop to grow (wheat now grows in 15 seconds)
+        await this.sleep(16000);
         
         // Harvest the crop
         emptyPlot.click();
