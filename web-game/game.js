@@ -31,12 +31,16 @@ class VoiceFarmGame {
         this.setupManagers();
         this.createFarmGrid();
         this.setupEventListeners();
+        this.setupMobileOptimizations();
         this.updateUI();
         this.startAdvancedGameLoop();
         this.loadSounds();
         
         // Load saved game state
         this.loadGameState();
+        
+        // Initialize testing capabilities
+        this.initializeTestingCapabilities();
         
         console.log('🌾 Voice Farm Game initialized!');
     }
@@ -132,6 +136,70 @@ class VoiceFarmGame {
         document.getElementById('harvest-all-btn').addEventListener('click', () => this.harvestAllCrops());
         document.getElementById('clear-farm-btn').addEventListener('click', () => this.clearHarvestedCrops());
         document.getElementById('save-game-btn').addEventListener('click', () => this.saveGameState(true));
+    }
+    
+    setupMobileOptimizations() {
+        // Detect mobile device
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        const isTouchDevice = 'ontouchstart' in window;
+        
+        if (isMobile || isTouchDevice) {
+            // Add mobile-specific class
+            document.body.classList.add('mobile-device');
+            
+            // Disable context menu on long press
+            document.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+            });
+            
+            // Add touch feedback
+            document.addEventListener('touchstart', (e) => {
+                if (e.target.classList.contains('farm-plot') || 
+                    e.target.classList.contains('crop-btn') ||
+                    e.target.classList.contains('action-btn')) {
+                    e.target.style.transform = 'scale(0.95)';
+                }
+            });
+            
+            document.addEventListener('touchend', (e) => {
+                if (e.target.classList.contains('farm-plot') || 
+                    e.target.classList.contains('crop-btn') ||
+                    e.target.classList.contains('action-btn')) {
+                    setTimeout(() => {
+                        e.target.style.transform = '';
+                    }, 150);
+                }
+            });
+            
+            // Prevent zoom on double tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (e) => {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    e.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Add haptic feedback if available
+            if ('vibrate' in navigator) {
+                document.addEventListener('touchstart', (e) => {
+                    if (e.target.classList.contains('farm-plot')) {
+                        navigator.vibrate(50); // Short vibration
+                    }
+                });
+            }
+            
+            // Optimize message display for mobile
+            const messageArea = document.querySelector('.message-area');
+            if (messageArea) {
+                messageArea.style.position = 'sticky';
+                messageArea.style.bottom = '0';
+                messageArea.style.zIndex = '100';
+            }
+            
+            console.log('📱 Mobile optimizations enabled');
+        }
     }
     
     createCropButtons() {
@@ -535,38 +603,566 @@ class VoiceFarmGame {
         
         this.addMessage(`Farm reset! Start your cozy farming journey! 🌱`, 'welcome');
     }
+    
+    initializeTestingCapabilities() {
+        // Auto-run basic validation on initialization
+        setTimeout(() => {
+            this.runBasicValidation();
+        }, 2000); // Wait 2 seconds for everything to load
+        
+        // Add global testing functions
+        window.runGameTests = () => {
+            if (window.GameTester) {
+                const tester = new GameTester(this);
+                return tester.runAllTests();
+            } else {
+                console.error('GameTester not available');
+            }
+        };
+        
+        window.testGamePerformance = () => {
+            this.runPerformanceTest();
+        };
+        
+        window.validateGameState = () => {
+            this.runBasicValidation();
+        };
+    }
+    
+    runBasicValidation() {
+        const validation = {
+            timestamp: new Date().toISOString(),
+            tests: [],
+            passed: 0,
+            failed: 0
+        };
+        
+        // Test 1: Core managers are initialized
+        const managers = ['cropManager', 'resourceManager', 'timerManager', 'storageManager', 'farmGrid'];
+        managers.forEach(manager => {
+            if (this[manager]) {
+                validation.tests.push({ name: `${manager} initialized`, status: 'PASS' });
+                validation.passed++;
+            } else {
+                validation.tests.push({ name: `${manager} initialized`, status: 'FAIL' });
+                validation.failed++;
+            }
+        });
+        
+        // Test 2: DOM elements exist
+        const requiredElements = ['player-money', 'player-level', 'farm-grid', 'game-messages'];
+        requiredElements.forEach(id => {
+            if (document.getElementById(id)) {
+                validation.tests.push({ name: `Element ${id} exists`, status: 'PASS' });
+                validation.passed++;
+            } else {
+                validation.tests.push({ name: `Element ${id} exists`, status: 'FAIL' });
+                validation.failed++;
+            }
+        });
+        
+        // Test 3: Game state is valid
+        const resources = this.resourceManager.getResource('money');
+        if (typeof resources === 'number' && resources >= 0) {
+            validation.tests.push({ name: 'Valid resource state', status: 'PASS' });
+            validation.passed++;
+        } else {
+            validation.tests.push({ name: 'Valid resource state', status: 'FAIL' });
+            validation.failed++;
+        }
+        
+        console.log('🧪 Basic Game Validation Results:', validation);
+        
+        const successRate = (validation.passed / (validation.passed + validation.failed)) * 100;
+        if (successRate >= 90) {
+            this.addMessage(`✅ Game validation passed (${successRate.toFixed(1)}%)`, 'system');
+        } else {
+            this.addMessage(`⚠️ Game validation issues detected (${successRate.toFixed(1)}%)`, 'error');
+        }
+        
+        return validation;
+    }
+    
+    runPerformanceTest() {
+        const startTime = performance.now();
+        const startMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
+        
+        // Simulate game operations
+        let operations = 0;
+        for (let i = 0; i < 1000; i++) {
+            this.farmGrid.updateGrowth();
+            this.updateUI();
+            operations++;
+        }
+        
+        const endTime = performance.now();
+        const endMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
+        
+        const results = {
+            operations,
+            duration: endTime - startTime,
+            memoryIncrease: endMemory - startMemory,
+            operationsPerSecond: operations / ((endTime - startTime) / 1000)
+        };
+        
+        console.log('📈 Performance Test Results:', results);
+        
+        if (results.duration < 100) {
+            this.addMessage(`🚀 Performance test passed (${results.duration.toFixed(2)}ms)`, 'system');
+        } else {
+            this.addMessage(`⚠️ Performance concerns (${results.duration.toFixed(2)}ms)`, 'error');
+        }
+        
+        return results;
+    }
+}
+
+// 🎮 KeyboardShortcutManager - Comprehensive Keyboard Controls
+class KeyboardShortcutManager {
+    constructor(game) {
+        this.game = game;
+        this.shortcuts = new Map();
+        this.isEnabled = true;
+        this.showHelpModal = false;
+        
+        this.defineShortcuts();
+    }
+    
+    defineShortcuts() {
+        // Crop selection shortcuts (1-8 for all crops)
+        this.shortcuts.set('1', { action: () => this.selectCrop('wheat'), description: 'Select Wheat' });
+        this.shortcuts.set('2', { action: () => this.selectCrop('tomatoes'), description: 'Select Tomatoes' });
+        this.shortcuts.set('3', { action: () => this.selectCrop('carrots'), description: 'Select Carrots' });
+        this.shortcuts.set('4', { action: () => this.selectCrop('strawberries'), description: 'Select Strawberries' });
+        this.shortcuts.set('5', { action: () => this.selectCrop('corn'), description: 'Select Corn' });
+        this.shortcuts.set('6', { action: () => this.selectCrop('lettuce'), description: 'Select Lettuce' });
+        this.shortcuts.set('7', { action: () => this.selectCrop('sunflowers'), description: 'Select Sunflowers' });
+        this.shortcuts.set('8', { action: () => this.selectCrop('pumpkins'), description: 'Select Pumpkins' });
+        
+        // Action shortcuts
+        this.shortcuts.set('w', { action: () => this.game.waterAllCrops(), description: 'Water All Crops' });
+        this.shortcuts.set('h', { action: () => this.game.harvestAllCrops(), description: 'Harvest All Crops' });
+        this.shortcuts.set('c', { action: () => this.game.clearHarvestedCrops(), description: 'Clear Harvested Plots' });
+        this.shortcuts.set('s', { action: () => this.game.saveGameState(true), description: 'Save Game' });
+        
+        // Navigation shortcuts
+        this.shortcuts.set('ArrowUp', { action: () => this.navigatePlots('up'), description: 'Navigate Up' });
+        this.shortcuts.set('ArrowDown', { action: () => this.navigatePlots('down'), description: 'Navigate Down' });
+        this.shortcuts.set('ArrowLeft', { action: () => this.navigatePlots('left'), description: 'Navigate Left' });
+        this.shortcuts.set('ArrowRight', { action: () => this.navigatePlots('right'), description: 'Navigate Right' });
+        this.shortcuts.set(' ', { action: () => this.activateSelectedPlot(), description: 'Activate Selected Plot' });
+        
+        // Quick actions
+        this.shortcuts.set('p', { action: () => this.quickPlant(), description: 'Quick Plant on Empty Plots' });
+        this.shortcuts.set('a', { action: () => this.selectAllPlots(), description: 'Select All Plots' });
+        this.shortcuts.set('Escape', { action: () => this.clearSelection(), description: 'Clear Selection' });
+        
+        // Debug and testing (Ctrl combinations)
+        this.shortcuts.set('ctrl+t', { action: () => this.runQuickTest(), description: 'Run Quick Test' });
+        this.shortcuts.set('ctrl+d', { action: () => this.toggleDebugMode(), description: 'Toggle Debug Mode' });
+        this.shortcuts.set('ctrl+r', { action: () => this.game.resetGame(), description: 'Reset Game' });
+        
+        // Help
+        this.shortcuts.set('?', { action: () => this.showKeyboardHelp(), description: 'Show Keyboard Help' });
+        this.shortcuts.set('F1', { action: () => this.showKeyboardHelp(), description: 'Show Keyboard Help' });
+    }
+    
+    init() {
+        document.addEventListener('keydown', (e) => this.handleKeydown(e));
+        document.addEventListener('keyup', (e) => this.handleKeyup(e));
+        
+        // Initialize plot navigation
+        this.selectedPlotIndex = 0;
+        this.highlightSelectedPlot();
+        
+        console.log('🎮 KeyboardShortcutManager initialized');
+    }
+    
+    handleKeydown(e) {
+        if (!this.isEnabled) return;
+        
+        // Handle special key combinations
+        let keyCombo = '';
+        if (e.ctrlKey) keyCombo += 'ctrl+';
+        if (e.shiftKey) keyCombo += 'shift+';
+        if (e.altKey) keyCombo += 'alt+';
+        keyCombo += e.key.toLowerCase();
+        
+        // Check for exact match first
+        const shortcut = this.shortcuts.get(keyCombo) || this.shortcuts.get(e.key);
+        
+        if (shortcut) {
+            e.preventDefault();
+            try {
+                shortcut.action();
+                this.showKeyPress(e.key);
+            } catch (error) {
+                console.error('Keyboard shortcut error:', error);
+            }
+        }
+    }
+    
+    handleKeyup(e) {
+        // Handle any key release actions if needed
+    }
+    
+    selectCrop(cropId) {
+        const availableCrops = this.game.cropManager.getCropsForLevel(
+            this.game.resourceManager.getResource('level')
+        );
+        
+        const crop = availableCrops.find(c => c.id === cropId);
+        if (crop && this.game.resourceManager.canAfford('money', crop.seedCost)) {
+            this.game.selectedCrop = cropId;
+            
+            // Update UI
+            document.querySelectorAll('.crop-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.crop === cropId);
+            });
+            
+            this.game.addMessage(`Selected ${crop.name}! 🌱`, 'plant');
+        } else if (crop) {
+            this.game.addMessage(`Cannot afford ${crop.name} seeds! Need ${crop.seedCost} coins.`, 'error');
+        } else {
+            this.game.addMessage(`${cropId} not available at your level!`, 'error');
+        }
+    }
+    
+    navigatePlots(direction) {
+        const gridSize = 5; // 5x5 grid
+        const totalPlots = 25;
+        
+        let newIndex = this.selectedPlotIndex;
+        
+        switch (direction) {
+            case 'up':
+                newIndex = this.selectedPlotIndex - gridSize;
+                if (newIndex < 0) newIndex = this.selectedPlotIndex + (gridSize * (gridSize - 1));
+                break;
+            case 'down':
+                newIndex = this.selectedPlotIndex + gridSize;
+                if (newIndex >= totalPlots) newIndex = this.selectedPlotIndex - (gridSize * (gridSize - 1));
+                break;
+            case 'left':
+                newIndex = this.selectedPlotIndex - 1;
+                if (newIndex < 0 || Math.floor(newIndex / gridSize) !== Math.floor(this.selectedPlotIndex / gridSize)) {
+                    newIndex = this.selectedPlotIndex + (gridSize - 1);
+                }
+                break;
+            case 'right':
+                newIndex = this.selectedPlotIndex + 1;
+                if (newIndex >= totalPlots || Math.floor(newIndex / gridSize) !== Math.floor(this.selectedPlotIndex / gridSize)) {
+                    newIndex = this.selectedPlotIndex - (gridSize - 1);
+                }
+                break;
+        }
+        
+        this.selectedPlotIndex = newIndex;
+        this.highlightSelectedPlot();
+    }
+    
+    highlightSelectedPlot() {
+        // Remove previous highlights
+        document.querySelectorAll('.farm-plot').forEach(plot => {
+            plot.classList.remove('keyboard-selected');
+        });
+        
+        // Add highlight to selected plot
+        const selectedPlot = document.querySelector(`[data-plot-index="${this.selectedPlotIndex}"]`);
+        if (selectedPlot) {
+            selectedPlot.classList.add('keyboard-selected');
+            selectedPlot.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        // Add CSS for highlighting if not already added
+        if (!document.querySelector('#keyboard-highlight-styles')) {
+            const style = document.createElement('style');
+            style.id = 'keyboard-highlight-styles';
+            style.textContent = `
+                .farm-plot.keyboard-selected {
+                    outline: 3px solid #4A90E2;
+                    outline-offset: 2px;
+                    animation: keyboardPulse 1s ease-in-out infinite alternate;
+                }
+                
+                @keyframes keyboardPulse {
+                    from { outline-color: #4A90E2; }
+                    to { outline-color: #7BB3F0; }
+                }
+                
+                .key-press-indicator {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 10px 15px;
+                    border-radius: 8px;
+                    font-family: monospace;
+                    font-size: 14px;
+                    z-index: 1000;
+                    animation: keyPressShow 0.8s ease-out;
+                }
+                
+                @keyframes keyPressShow {
+                    0% { opacity: 0; transform: translateY(-20px) scale(0.8); }
+                    30% { opacity: 1; transform: translateY(0) scale(1.1); }
+                    100% { opacity: 1; transform: scale(1); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
+    activateSelectedPlot() {
+        const selectedPlot = document.querySelector(`[data-plot-index="${this.selectedPlotIndex}"]`);
+        if (selectedPlot) {
+            selectedPlot.click();
+            this.showKeyPress('SPACE');
+        }
+    }
+    
+    quickPlant() {
+        const emptyPlots = document.querySelectorAll('.farm-plot.empty');
+        let planted = 0;
+        
+        emptyPlots.forEach(plot => {
+            if (planted < 5) { // Limit to 5 for quick planting
+                plot.click();
+                planted++;
+            }
+        });
+        
+        if (planted > 0) {
+            this.game.addMessage(`Quick planted ${planted} crops! 🌱`, 'plant');
+        } else {
+            this.game.addMessage('No empty plots available for quick planting!', 'error');
+        }
+    }
+    
+    selectAllPlots() {
+        // Visual selection of all plots (for potential future batch operations)
+        document.querySelectorAll('.farm-plot').forEach(plot => {
+            plot.classList.add('keyboard-selected');
+        });
+        
+        setTimeout(() => {
+            document.querySelectorAll('.farm-plot').forEach(plot => {
+                plot.classList.remove('keyboard-selected');
+            });
+            this.highlightSelectedPlot(); // Restore single selection
+        }, 1000);
+        
+        this.game.addMessage('All plots selected! 📋', 'system');
+    }
+    
+    clearSelection() {
+        document.querySelectorAll('.farm-plot').forEach(plot => {
+            plot.classList.remove('keyboard-selected');
+        });
+        this.game.addMessage('Selection cleared! ❌', 'system');
+    }
+    
+    runQuickTest() {
+        if (window.runGameTests) {
+            this.game.addMessage('Running quick tests... 🧪', 'system');
+            window.runGameTests();
+        } else {
+            this.game.addMessage('GameTester not available!', 'error');
+        }
+    }
+    
+    toggleDebugMode() {
+        const debugInfo = document.getElementById('debug-info');
+        
+        if (debugInfo) {
+            debugInfo.remove();
+            this.game.addMessage('Debug mode disabled 🔧', 'system');
+        } else {
+            this.createDebugPanel();
+            this.game.addMessage('Debug mode enabled 🔧', 'system');
+        }
+    }
+    
+    createDebugPanel() {
+        const panel = document.createElement('div');
+        panel.id = 'debug-info';
+        panel.style.cssText = `
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 1000;
+            max-width: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+        `;
+        
+        document.body.appendChild(panel);
+        
+        // Update debug info every second
+        const updateDebugInfo = () => {
+            if (document.getElementById('debug-info')) {
+                const stats = this.game.resourceManager.getResourceStats();
+                const timerStats = this.game.timerManager.getStats();
+                const storageStats = this.game.storageManager.getStats();
+                
+                panel.innerHTML = `
+                    <h4 style="color: #00ff00; margin: 0 0 10px 0;">🔧 Debug Info</h4>
+                    <div><strong>Resources:</strong></div>
+                    <div>Money: ${stats.resources.money}</div>
+                    <div>Level: ${stats.resources.level}</div>
+                    <div>XP: ${stats.resources.xp}</div>
+                    <div>Harvests: ${stats.resources.totalHarvests}</div>
+                    
+                    <div style="margin-top: 10px;"><strong>Timers:</strong></div>
+                    <div>Active: ${timerStats.activeTimers}</div>
+                    <div>Total: ${timerStats.totalTimers}</div>
+                    <div>Avg Update: ${timerStats.averageUpdateTime.toFixed(2)}ms</div>
+                    
+                    <div style="margin-top: 10px;"><strong>Storage:</strong></div>
+                    <div>Total Saves: ${storageStats.totalSaves}</div>
+                    <div>Auto Saves: ${storageStats.autoSaves}</div>
+                    <div>Storage Used: ${(storageStats.totalStorageUsed / 1024).toFixed(1)}KB</div>
+                    
+                    <div style="margin-top: 10px;"><strong>Performance:</strong></div>
+                    <div>FPS: ${Math.round(1000 / 16)} (estimated)</div>
+                    <div>Memory: ${performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + 'MB' : 'N/A'}</div>
+                `;
+                
+                setTimeout(updateDebugInfo, 1000);
+            }
+        };
+        
+        updateDebugInfo();
+    }
+    
+    showKeyPress(key) {
+        // Remove existing indicator
+        const existing = document.querySelector('.key-press-indicator');
+        if (existing) existing.remove();
+        
+        // Create new indicator
+        const indicator = document.createElement('div');
+        indicator.className = 'key-press-indicator';
+        indicator.textContent = `Key: ${key.toUpperCase()}`;
+        
+        document.body.appendChild(indicator);
+        
+        // Remove after animation
+        setTimeout(() => indicator.remove(), 800);
+    }
+    
+    showKeyboardHelp() {
+        const helpModal = document.createElement('div');
+        helpModal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        `;
+        
+        const helpContent = document.createElement('div');
+        helpContent.style.cssText = `
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            font-family: 'Nunito', sans-serif;
+        `;
+        
+        helpContent.innerHTML = `
+            <h2 style="margin-top: 0; color: #228B22;">🎮 Keyboard Shortcuts</h2>
+            
+            <h3>🌱 Crop Selection</h3>
+            <div style="margin-bottom: 15px;">
+                <strong>1-8:</strong> Select crops (Wheat, Tomatoes, Carrots, Strawberries, Corn, Lettuce, Sunflowers, Pumpkins)
+            </div>
+            
+            <h3>🚀 Quick Actions</h3>
+            <div style="margin-bottom: 15px;">
+                <strong>W:</strong> Water all crops<br>
+                <strong>H:</strong> Harvest all ready crops<br>
+                <strong>C:</strong> Clear harvested plots<br>
+                <strong>S:</strong> Save game<br>
+                <strong>P:</strong> Quick plant on empty plots
+            </div>
+            
+            <h3>🧭 Navigation</h3>
+            <div style="margin-bottom: 15px;">
+                <strong>Arrow Keys:</strong> Navigate between plots<br>
+                <strong>Space:</strong> Activate selected plot<br>
+                <strong>A:</strong> Select all plots<br>
+                <strong>Escape:</strong> Clear selection
+            </div>
+            
+            <h3>🔧 Advanced</h3>
+            <div style="margin-bottom: 15px;">
+                <strong>Ctrl+T:</strong> Run quick tests<br>
+                <strong>Ctrl+D:</strong> Toggle debug mode<br>
+                <strong>Ctrl+R:</strong> Reset game<br>
+                <strong>F1 or ?:</strong> Show this help
+            </div>
+            
+            <button onclick="this.parentElement.parentElement.remove()" 
+                    style="background: #228B22; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; margin-top: 20px;">
+                Close (ESC)
+            </button>
+        `;
+        
+        helpModal.appendChild(helpContent);
+        document.body.appendChild(helpModal);
+        
+        // Close on escape or click outside
+        const closeModal = (e) => {
+            if (e.key === 'Escape' || e.target === helpModal) {
+                helpModal.remove();
+                document.removeEventListener('keydown', closeModal);
+            }
+        };
+        
+        document.addEventListener('keydown', closeModal);
+        helpModal.addEventListener('click', closeModal);
+    }
+    
+    enable() {
+        this.isEnabled = true;
+        console.log('🎮 Keyboard shortcuts enabled');
+    }
+    
+    disable() {
+        this.isEnabled = false;
+        console.log('🎮 Keyboard shortcuts disabled');
+    }
+    
+    destroy() {
+        this.isEnabled = false;
+        document.getElementById('debug-info')?.remove();
+        document.querySelectorAll('.key-press-indicator').forEach(el => el.remove());
+        console.log('🎮 KeyboardShortcutManager destroyed');
+    }
 }
 
 // Initialize the game when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     window.voiceFarmGame = new VoiceFarmGame();
     
-    // Add keyboard shortcuts
-    document.addEventListener('keydown', (e) => {
-        const game = window.voiceFarmGame;
-        
-        switch (e.key) {
-            case '1': game.selectedCrop = 'tomatoes'; break;
-            case '2': game.selectedCrop = 'carrots'; break;
-            case '3': game.selectedCrop = 'corn'; break;
-            case '4': game.selectedCrop = 'strawberries'; break;
-            case '5': game.selectedCrop = 'lettuce'; break;
-            case 'w': game.waterAllCrops(); break;
-            case 'h': game.harvestAllCrops(); break;
-            case 'c': game.clearHarvestedCrops(); break;
-            case 'r': if (e.ctrlKey) { e.preventDefault(); game.resetGame(); } break;
-        }
-        
-        // Update selected crop button
-        if (['1', '2', '3', '4', '5'].includes(e.key)) {
-            const crops = ['tomatoes', 'carrots', 'corn', 'strawberries', 'lettuce'];
-            const cropIndex = parseInt(e.key) - 1;
-            document.querySelectorAll('.crop-btn').forEach(btn => {
-                btn.classList.toggle('selected', btn.dataset.crop === crops[cropIndex]);
-            });
-            game.addMessage(`Selected ${game.cropConfig[crops[cropIndex]].name}! 🌱`, 'plant');
-        }
-    });
+    // Enhanced keyboard shortcuts system
+    const keyboardHandler = new KeyboardShortcutManager(window.voiceFarmGame);
+    keyboardHandler.init();
     
     console.log('🎮 Keyboard shortcuts:');
     console.log('1-5: Select crops | W: Water all | H: Harvest all | C: Clear | Ctrl+R: Reset');

@@ -533,6 +533,42 @@ body {
     .action-hint {
         display: none !important;
     }
+    
+    /* Enhanced mobile button feedback */
+    .crop-btn:active,
+    .action-btn:active {
+        transform: scale(0.95);
+        background-color: rgba(144, 238, 144, 0.4);
+    }
+    
+    /* Better spacing for touch interfaces */
+    .crop-buttons {
+        gap: 15px;
+    }
+    
+    .action-buttons {
+        gap: 12px;
+    }
+    
+    /* Larger text for better readability */
+    .crop-timer {
+        font-size: 0.8rem;
+        padding: 3px 7px;
+    }
+    
+    .stat-value {
+        font-size: 1.6rem;
+    }
+    
+    /* Improve message visibility on mobile */
+    .message-area {
+        margin-top: 15px;
+    }
+    
+    .message {
+        padding: 15px 20px;
+        font-size: 1.1rem;
+    }
 }
 
 /* Loading Animation */
@@ -549,4 +585,71 @@ body {
 @keyframes fadeInHint {
     from { opacity: 0; transform: translateX(-50%) translateY(5px); }
     to { opacity: 1; transform: translateX(-50%) translateY(0); }
-} 
+}
+
+/* Mobile-specific optimizations */
+.mobile-device {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-device .farm-plot {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.mobile-device .crop-btn,
+.mobile-device .action-btn {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+}
+
+.mobile-device .message-area {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent pinch zoom */
+.mobile-device {
+    touch-action: pan-x pan-y;
+}
+
+/* Enhanced mobile tap feedback */
+.mobile-device .farm-plot:active {
+    background-color: rgba(144, 238, 144, 0.5) !important;
+    transform: scale(0.95) !important;
+}
+
+.mobile-device .crop-btn:active {
+    background-color: rgba(144, 238, 144, 0.6) !important;
+    transform: scale(0.95) !important;
+}
+
+.mobile-device .action-btn:active {
+    transform: scale(0.95) !important;
+    filter: brightness(0.9);
+}
+
+/* Ensure buttons are easily tappable */
+@media (max-width: 768px) {
+    .mobile-device .farm-plot {
+        min-width: 60px !important;
+        min-height: 60px !important;
+    }
+    
+    .mobile-device .crop-btn {
+        min-height: 60px !important;
+        padding: 15px !important;
+    }
+    
+    .mobile-device .action-btn {
+        min-height: 50px !important;
+        padding: 16px !important;
+    }
+}
