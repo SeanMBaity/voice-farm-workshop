@@ -653,3 +653,197 @@ body {
         padding: 16px !important;
     }
 }
+
+/* Crop-specific visual styles and animations */
+.crop-wheat {
+    background: linear-gradient(135deg, #F5DEB3, #DEB887);
+    border-color: #CD853F;
+}
+
+.crop-tomatoes {
+    background: linear-gradient(135deg, #FFB6C1, #FF6347);
+    border-color: #DC143C;
+}
+
+.crop-carrots {
+    background: linear-gradient(135deg, #FFA500, #FF8C00);
+    border-color: #FF4500;
+}
+
+.crop-strawberries {
+    background: linear-gradient(135deg, #FFB6C1, #FF69B4);
+    border-color: #C71585;
+}
+
+.crop-corn {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    border-color: #DAA520;
+}
+
+.crop-lettuce {
+    background: linear-gradient(135deg, #98FB98, #90EE90);
+    border-color: #32CD32;
+}
+
+.crop-sunflowers {
+    background: linear-gradient(135deg, #FFD700, #FFFF00);
+    border-color: #FFA500;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.crop-pumpkins {
+    background: linear-gradient(135deg, #FF8C00, #FF4500);
+    border-color: #8B4513;
+    animation: pumpkinGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pumpkinGlow {
+    from { box-shadow: 0 0 5px rgba(255, 140, 0, 0.5); }
+    to { box-shadow: 0 0 15px rgba(255, 140, 0, 0.8); }
+}
+
+/* Rarity-based visual enhancements */
+.rarity-common {
+    border-width: 2px;
+}
+
+.rarity-uncommon {
+    border-width: 3px;
+    box-shadow: 0 0 10px rgba(135, 206, 235, 0.4);
+}
+
+.rarity-rare {
+    border-width: 3px;
+    box-shadow: 0 0 15px rgba(221, 160, 221, 0.6);
+    animation: rareShimmer 3s ease-in-out infinite;
+}
+
+@keyframes rareShimmer {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.02); filter: brightness(1.1); }
+}
+
+.rarity-epic {
+    border-width: 4px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+    animation: epicPulse 2s ease-in-out infinite;
+}
+
+@keyframes epicPulse {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.7); }
+    50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.9); }
+}
+
+.rarity-legendary {
+    border-width: 4px;
+    background: linear-gradient(45deg, #FF69B4, #FFD700, #FF69B4);
+    background-size: 200% 200%;
+    animation: legendaryRainbow 3s ease infinite;
+    box-shadow: 0 0 25px rgba(255, 105, 180, 0.8);
+}
+
+@keyframes legendaryRainbow {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Growth stage animations */
+.farm-plot.growing .crop-icon {
+    animation: growthPulse 2s ease-in-out infinite;
+}
+
+@keyframes growthPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+.farm-plot.ready .crop-icon {
+    animation: readyBounce 1s ease-in-out infinite;
+}
+
+@keyframes readyBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+}
+
+/* Special crop effects */
+.crop-sunflowers.ready {
+    animation: sunflowerSpin 4s linear infinite;
+}
+
+@keyframes sunflowerSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(15deg); }
+}
+
+.crop-pumpkins.growing {
+    animation: pumpkinGrow 3s ease-in-out infinite;
+}
+
+@keyframes pumpkinGrow {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Unlock animation for new crops */
+.crop-btn.newly-unlocked {
+    animation: unlockGlow 2s ease-in-out 3;
+    position: relative;
+}
+
+@keyframes unlockGlow {
+    0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.9); }
+}
+
+.crop-btn.newly-unlocked::after {
+    content: "NEW!";
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #FF4500;
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-weight: bold;
+    animation: newBadgeBounce 0.5s ease-out;
+}
+
+@keyframes newBadgeBounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Profit indicator colors */
+.crop-btn .profit.high-profit {
+    color: #228B22;
+    font-weight: bold;
+}
+
+.crop-btn .profit.medium-profit {
+    color: #DAA520;
+}
+
+.crop-btn .profit.low-profit {
+    color: #CD853F;
+}
+
+/* Seasonal theme support */
+.theme-spring .farm-plot {
+    background: linear-gradient(135deg, #98FB98, #90EE90);
+}
+
+.theme-summer .farm-plot {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+}
+
+.theme-autumn .farm-plot {
+    background: linear-gradient(135deg, #FF8C00, #FF4500);
+}
+
+.theme-winter .farm-plot {
+    background: linear-gradient(135deg, #E0E0E0, #C0C0C0);
+}

@@ -15,6 +15,10 @@ class VoiceFarmGame {
         });
         this.farmGrid = null;
         
+        // Initialize advanced systems
+        this.economicBalance = null;
+        this.unlockSystem = null;
+        
         this.sounds = {
             plant: null,
             water: null,
@@ -41,6 +45,9 @@ class VoiceFarmGame {
         
         // Initialize testing capabilities
         this.initializeTestingCapabilities();
+        
+        // Initialize advanced systems after everything else is ready
+        this.initializeAdvancedSystems();
         
         console.log('🌾 Voice Farm Game initialized!');
     }
@@ -249,6 +256,11 @@ class VoiceFarmGame {
         if (wheatButton && !wheatButton.classList.contains('disabled')) {
             wheatButton.classList.add('selected');
         }
+        
+        // Apply visual enhancements
+        setTimeout(() => {
+            this.enhanceCropButtons();
+        }, 100);
     }
     
     updateCropButtonStates() {
@@ -294,9 +306,20 @@ class VoiceFarmGame {
         if (success) {
             // Deduct seed cost
             this.resourceManager.spendResource('money', crop.seedCost, `${crop.name}_seeds`);
+            
+            // Track planting for unlock system
+            if (this.unlockSystem) {
+                this.unlockSystem.trackPlanting(this.selectedCrop, true);
+            }
+            
             this.playSound('plant');
             this.addMessage(`Planted ${crop.name}! 🌱 Spent ${crop.seedCost} coins on seeds.`, 'plant');
             this.saveGameState(false); // Auto-save
+        } else {
+            // Track failed planting
+            if (this.unlockSystem) {
+                this.unlockSystem.trackPlanting(this.selectedCrop, false);
+            }
         }
     }
     
@@ -331,6 +354,12 @@ class VoiceFarmGame {
                 // Award XP
                 this.resourceManager.addResource('xp', result.xp, `${crop.name}_harvest`);
                 this.resourceManager.addResource('totalHarvests', 1, 'harvest');
+                
+                // Track harvest for unlock system
+                if (this.unlockSystem) {
+                    const profit = crop.sellPrice - crop.seedCost;
+                    this.unlockSystem.trackHarvest(result.type, profit);
+                }
                 
                 this.playSound('harvest');
                 this.addMessage(`Harvested ${crop.name}! 🌾 Earned ${crop.sellPrice} coins and ${result.xp} XP!`, 'harvest');
@@ -717,6 +746,95 @@ class VoiceFarmGame {
         }
         
         return results;
+    }
+    
+    initializeAdvancedSystems() {
+        // Initialize economic balance system
+        this.economicBalance = new EconomicBalance(this.cropManager, this.resourceManager);
+        
+        // Initialize unlock system
+        this.unlockSystem = new UnlockSystem(this.cropManager, this.resourceManager);
+        
+        // Set up unlock callbacks
+        this.unlockSystem.onUnlock((unlock) => {
+            this.handleUnlock(unlock);
+        });
+        
+        // Apply visual enhancements to crop buttons
+        this.enhanceCropButtons();
+        
+        // Check for initial unlocks
+        const playerLevel = this.resourceManager.getResource('level');
+        this.unlockSystem.checkUnlocks(playerLevel);
+        
+        // Run initial balance analysis
+        const balanceReport = this.economicBalance.generateBalanceReport();
+        console.log('💰 Economic Balance Report:', balanceReport);
+        
+        // Add global functions for testing
+        window.getBalanceReport = () => this.economicBalance.generateBalanceReport();
+        window.getUnlockProgress = () => this.unlockSystem.getProgressSummary();
+        window.simulateProgression = () => this.economicBalance.simulatePlayerProgression();
+        
+        console.log('🔧 Advanced systems initialized');
+    }
+    
+    handleUnlock(unlock) {
+        // Display unlock notification
+        if (unlock.type === 'crop') {
+            this.addMessage(`🎉 New crop unlocked: ${unlock.name}!`, 'levelup');
+            
+            // Add visual indicator to newly unlocked crop
+            setTimeout(() => {
+                const cropButton = document.querySelector(`[data-crop="${unlock.id}"]`);
+                if (cropButton) {
+                    cropButton.classList.add('newly-unlocked');
+                    setTimeout(() => {
+                        cropButton.classList.remove('newly-unlocked');
+                    }, 6000); // Remove after 6 seconds
+                }
+            }, 500);
+            
+        } else if (unlock.type === 'achievement') {
+            this.addMessage(`🏆 Achievement unlocked: ${unlock.name}!`, 'levelup');
+            
+        } else if (unlock.type === 'special') {
+            this.addMessage(`⭐ Special unlock: ${unlock.name}!`, 'levelup');
+        }
+        
+        // Update crop buttons to show new unlocks
+        this.createCropButtons();
+    }
+    
+    enhanceCropButtons() {
+        // Add crop-specific styling and profit indicators
+        document.querySelectorAll('.crop-btn').forEach(button => {
+            const cropId = button.dataset.crop;
+            const crop = this.cropManager.getCropDefinition(cropId);
+            
+            if (crop) {
+                // Add crop-specific class
+                button.classList.add(`crop-${cropId}`);
+                
+                // Add rarity class
+                button.classList.add(`rarity-${crop.rarity}`);
+                
+                // Enhance profit display with color coding
+                const profitElement = button.querySelector('.profit');
+                if (profitElement) {
+                    const profit = this.cropManager.calculateProfit(cropId);
+                    const profitMargin = this.cropManager.calculateProfitMargin(cropId);
+                    
+                    if (profitMargin > 100) {
+                        profitElement.classList.add('high-profit');
+                    } else if (profitMargin > 50) {
+                        profitElement.classList.add('medium-profit');
+                    } else {
+                        profitElement.classList.add('low-profit');
+                    }
+                }
+            }
+        });
     }
 }
 
