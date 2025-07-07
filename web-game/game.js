@@ -2,64 +2,21 @@
 
 class VoiceFarmGame {
     constructor() {
-        this.selectedCrop = 'tomatoes';
-        this.playerStats = {
-            level: 1,
-            xp: 0,
-            totalHarvests: 0
-        };
+        this.selectedCrop = 'wheat'; // Start with wheat as per requirements
         
-        this.cropConfig = {
-            tomatoes: { 
-                icon: '🍅', 
-                growthTime: 4000, // 4 seconds for demo (was 4 hours)
-                xpReward: 10, 
-                name: 'Tomatoes',
-                plantedIcon: '🌱',
-                growingIcon: '🌿'
-            },
-            carrots: { 
-                icon: '🥕', 
-                growthTime: 3000, // 3 seconds for demo
-                xpReward: 8, 
-                name: 'Carrots',
-                plantedIcon: '🌱',
-                growingIcon: '🌿'
-            },
-            corn: { 
-                icon: '🌽', 
-                growthTime: 6000, // 6 seconds for demo
-                xpReward: 15, 
-                name: 'Corn',
-                plantedIcon: '🌱',
-                growingIcon: '🌿'
-            },
-            strawberries: { 
-                icon: '🍓', 
-                growthTime: 5000, // 5 seconds for demo
-                xpReward: 12, 
-                name: 'Strawberries',
-                plantedIcon: '🌱',
-                growingIcon: '🌿'
-            },
-            lettuce: { 
-                icon: '🥬', 
-                growthTime: 2000, // 2 seconds for demo
-                xpReward: 6, 
-                name: 'Lettuce',
-                plantedIcon: '🌱',
-                growingIcon: '🌿'
-            }
-        };
+        // Initialize new management systems
+        this.cropManager = new CropManager();
+        this.resourceManager = new ResourceManager();
+        this.farmGrid = null;
         
         this.sounds = {
             plant: null,
             water: null,
             harvest: null,
-            levelup: null
+            levelup: null,
+            purchase: null,
+            sell: null
         };
-        
-        this.farmGrid = null;
         
         this.init();
     }
@@ -79,7 +36,8 @@ class VoiceFarmGame {
     
     createFarmGrid() {
         const farmGridElement = document.getElementById('farm-grid');
-        this.farmGrid = new FarmGrid(farmGridElement, this.cropConfig);
+        const cropConfig = this.getCropConfigForFarmGrid();
+        this.farmGrid = new FarmGrid(farmGridElement, cropConfig);
         
         // Set up event handlers
         this.farmGrid.setPlotActionHandler((plotIndex, plotState) => {
@@ -91,24 +49,103 @@ class VoiceFarmGame {
         });
     }
     
-    setupEventListeners() {
-        // Crop selection buttons
-        document.querySelectorAll('.crop-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.crop-btn').forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
-                this.selectedCrop = btn.dataset.crop;
-                this.addMessage(`Selected ${this.cropConfig[this.selectedCrop].name} for planting! 🌱`, 'plant');
-            });
+    getCropConfigForFarmGrid() {
+        // Convert CropManager format to FarmGrid format
+        const crops = this.cropManager.getAllCrops();
+        const config = {};
+        
+        crops.forEach(crop => {
+            config[crop.id] = {
+                icon: crop.readyIcon,
+                growthTime: crop.growthTime,
+                xpReward: crop.xpReward,
+                name: crop.name,
+                plantedIcon: crop.plantedIcon,
+                growingIcon: crop.growingIcon
+            };
         });
+        
+        return config;
+    }
+    
+    setupEventListeners() {
+        // Set up resource manager handlers
+        this.resourceManager.setResourceChangeHandler((resourceType, oldValue, newValue) => {
+            this.updateResourceDisplay(resourceType, newValue);
+            this.updateCropButtonStates();
+        });
+        
+        this.resourceManager.setLevelUpHandler((oldLevel, newLevel, benefit) => {
+            this.handleLevelUp(oldLevel, newLevel, benefit);
+        });
+        
+        // Create dynamic crop buttons
+        this.createCropButtons();
         
         // Action buttons
         document.getElementById('water-all-btn').addEventListener('click', () => this.waterAllCrops());
         document.getElementById('harvest-all-btn').addEventListener('click', () => this.harvestAllCrops());
         document.getElementById('clear-farm-btn').addEventListener('click', () => this.clearHarvestedCrops());
+    }
+    
+    createCropButtons() {
+        const container = document.getElementById('crop-buttons-container');
+        const playerLevel = this.resourceManager.getResource('level');
+        const availableCrops = this.cropManager.getCropsForLevel(playerLevel);
         
-        // Select tomatoes by default
-        document.querySelector('.crop-btn[data-crop="tomatoes"]').classList.add('selected');
+        container.innerHTML = '';
+        
+        availableCrops.forEach(crop => {
+            const button = document.createElement('button');
+            button.className = 'crop-btn';
+            button.dataset.crop = crop.id;
+            
+            const canAfford = this.resourceManager.canAfford('money', crop.seedCost);
+            const profit = this.cropManager.calculateProfit(crop.id);
+            const growthTimeDisplay = (crop.growthTime / 1000).toFixed(0);
+            
+            button.innerHTML = `
+                ${crop.icon} ${crop.name}<br>
+                <small>💰${crop.seedCost} • ${growthTimeDisplay}s • ${crop.xpReward} XP</small><br>
+                <small class="profit">Profit: +${profit}</small>
+            `;
+            
+            if (!canAfford) {
+                button.classList.add('disabled');
+                button.title = `Insufficient funds. Need ${crop.seedCost} coins.`;
+            }
+            
+            button.addEventListener('click', () => {
+                if (!canAfford) {
+                    this.addMessage(`Not enough money to buy ${crop.name} seeds! Need ${crop.seedCost} coins.`, 'error');
+                    return;
+                }
+                
+                document.querySelectorAll('.crop-btn').forEach(b => b.classList.remove('selected'));
+                button.classList.add('selected');
+                this.selectedCrop = crop.id;
+                this.addMessage(`Selected ${crop.name} for planting! 🌱 Cost: ${crop.seedCost} coins`, 'plant');
+            });
+            
+            container.appendChild(button);
+        });
+        
+        // Select wheat by default
+        const wheatButton = container.querySelector('[data-crop="wheat"]');
+        if (wheatButton && !wheatButton.classList.contains('disabled')) {
+            wheatButton.classList.add('selected');
+        }
+    }
+    
+    updateCropButtonStates() {
+        document.querySelectorAll('.crop-btn').forEach(btn => {
+            const cropId = btn.dataset.crop;
+            const crop = this.cropManager.getCropDefinition(cropId);
+            const canAfford = this.resourceManager.canAfford('money', crop.seedCost);
+            
+            btn.classList.toggle('disabled', !canAfford);
+            btn.title = canAfford ? '' : `Insufficient funds. Need ${crop.seedCost} coins.`;
+        });
     }
     
     handlePlotClick(plotIndex, plotState) {
@@ -125,10 +162,26 @@ class VoiceFarmGame {
     }
     
     plantCrop(plotIndex) {
+        const crop = this.cropManager.getCropDefinition(this.selectedCrop);
+        if (!crop) {
+            this.addMessage(`Invalid crop selected!`, 'error');
+            return;
+        }
+        
+        // Check if player can afford seeds
+        if (!this.resourceManager.canAfford('money', crop.seedCost)) {
+            this.addMessage(`Not enough money to buy ${crop.name} seeds! Need ${crop.seedCost} coins.`, 'error');
+            return;
+        }
+        
+        // Attempt to plant
         const success = this.farmGrid.plantCrop(plotIndex, this.selectedCrop);
         
         if (success) {
+            // Deduct seed cost
+            this.resourceManager.spendResource('money', crop.seedCost, `${crop.name}_seeds`);
             this.playSound('plant');
+            this.addMessage(`Planted ${crop.name}! 🌱 Spent ${crop.seedCost} coins on seeds.`, 'plant');
             this.saveGameState();
         }
     }
@@ -155,44 +208,58 @@ class VoiceFarmGame {
         const result = this.farmGrid.harvestCrop(plotIndex);
         
         if (result) {
-            // Award XP
-            this.playerStats.xp += result.xp;
-            this.playerStats.totalHarvests++;
-            
-            // Check for level up
-            const newLevel = Math.floor(this.playerStats.xp / 50) + 1;
-            const leveledUp = newLevel > this.playerStats.level;
-            this.playerStats.level = newLevel;
-            
-            this.playSound('harvest');
-            
-            if (leveledUp) {
-                this.playSound('levelup');
-                this.addMessage(`🎉 Level up! You're now level ${this.playerStats.level}! 🎉`, 'levelup');
+            const crop = this.cropManager.getCropDefinition(result.type);
+            if (crop) {
+                // Award money from selling the harvest
+                this.resourceManager.addResource('money', crop.sellPrice, `${crop.name}_harvest`);
+                this.resourceManager.resources.totalEarned = (this.resourceManager.resources.totalEarned || 0) + crop.sellPrice;
+                
+                // Award XP
+                this.resourceManager.addResource('xp', result.xp, `${crop.name}_harvest`);
+                this.resourceManager.addResource('totalHarvests', 1, 'harvest');
+                
+                this.playSound('harvest');
+                this.addMessage(`Harvested ${crop.name}! 🌾 Earned ${crop.sellPrice} coins and ${result.xp} XP!`, 'harvest');
+                this.saveGameState();
             }
-            
-            this.updateUI();
-            this.saveGameState();
         }
     }
     
     harvestAllCrops() {
+        const readyPlots = this.farmGrid.getReadyPlots();
+        
+        if (readyPlots.length === 0) {
+            this.addMessage(`No crops are ready to harvest yet! Be patient! ⏰`, 'harvest');
+            return;
+        }
+        
+        let totalMoney = 0;
+        let totalXP = 0;
+        let harvestedCount = 0;
+        
+        // Calculate total earnings before harvesting
+        readyPlots.forEach(plot => {
+            const cropType = plot.getCropType();
+            const crop = this.cropManager.getCropDefinition(cropType);
+            if (crop) {
+                totalMoney += crop.sellPrice;
+                totalXP += crop.xpReward;
+                harvestedCount++;
+            }
+        });
+        
+        // Perform the harvest
         const result = this.farmGrid.harvestAllCrops();
         
         if (result.count > 0) {
-            const oldLevel = this.playerStats.level;
-            this.playerStats.xp += result.xp;
-            this.playerStats.totalHarvests += result.count;
-            this.playerStats.level = Math.floor(this.playerStats.xp / 50) + 1;
+            // Award resources
+            this.resourceManager.addResource('money', totalMoney, 'mass_harvest');
+            this.resourceManager.resources.totalEarned = (this.resourceManager.resources.totalEarned || 0) + totalMoney;
+            this.resourceManager.addResource('xp', totalXP, 'mass_harvest');
+            this.resourceManager.addResource('totalHarvests', harvestedCount, 'mass_harvest');
             
             this.playSound('harvest');
-            
-            if (this.playerStats.level > oldLevel) {
-                this.playSound('levelup');
-                this.addMessage(`🎉 Level up! You're now level ${this.playerStats.level}! 🎉`, 'levelup');
-            }
-            
-            this.updateUI();
+            this.addMessage(`Harvested ${harvestedCount} crops! 🌾 Earned ${totalMoney} coins and ${totalXP} XP!`, 'harvest');
             this.saveGameState();
         }
     }
@@ -207,9 +274,47 @@ class VoiceFarmGame {
     
     
     updateUI() {
-        document.getElementById('player-level').textContent = this.playerStats.level;
-        document.getElementById('player-xp').textContent = this.playerStats.xp;
-        document.getElementById('total-harvests').textContent = this.playerStats.totalHarvests;
+        // Update all resource displays
+        this.updateResourceDisplay('money', this.resourceManager.getResource('money'));
+        this.updateResourceDisplay('level', this.resourceManager.getResource('level'));
+        this.updateResourceDisplay('xp', this.resourceManager.getResource('xp'));
+        this.updateResourceDisplay('totalHarvests', this.resourceManager.getResource('totalHarvests'));
+    }
+    
+    updateResourceDisplay(resourceType, value) {
+        const elementId = resourceType === 'totalHarvests' ? 'total-harvests' : `player-${resourceType}`;
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.textContent = value;
+            
+            // Add animation for money changes
+            if (resourceType === 'money') {
+                element.classList.add('updated');
+                setTimeout(() => element.classList.remove('updated'), 500);
+            }
+        }
+    }
+    
+    handleLevelUp(oldLevel, newLevel, benefit) {
+        this.playSound('levelup');
+        this.addMessage(`🎉 Level up! You're now level ${newLevel}! 🎉`, 'levelup');
+        
+        if (benefit) {
+            this.addMessage(`🎁 ${benefit.message}`, 'levelup');
+            
+            // If new crops were unlocked, recreate crop buttons
+            if (benefit.type === 'crop_unlock') {
+                this.createCropButtons();
+            }
+        }
+        
+        // Check if player unlocked new crops at this level
+        const newCrops = this.cropManager.getCropsUnlockedAtLevel(newLevel);
+        if (newCrops.length > 0) {
+            const cropNames = newCrops.map(crop => crop.name).join(', ');
+            this.addMessage(`🌱 New crops unlocked: ${cropNames}!`, 'levelup');
+            this.createCropButtons();
+        }
     }
     
     addMessage(text, type = 'welcome') {
@@ -258,9 +363,10 @@ class VoiceFarmGame {
     
     saveGameState() {
         const gameState = {
-            playerStats: this.playerStats,
+            resources: this.resourceManager.exportData(),
             selectedCrop: this.selectedCrop,
-            farmData: this.farmGrid.getAllPlotData()
+            farmData: this.farmGrid.getAllPlotData(),
+            version: '3.0' // Track version for future migrations
         };
         localStorage.setItem('voiceFarmGame', JSON.stringify(gameState));
     }
@@ -270,44 +376,62 @@ class VoiceFarmGame {
         if (saved) {
             try {
                 const gameState = JSON.parse(saved);
-                this.playerStats = { ...this.playerStats, ...gameState.playerStats };
-                this.selectedCrop = gameState.selectedCrop || 'tomatoes';
+                
+                // Import resource data
+                if (gameState.resources) {
+                    this.resourceManager.importData(gameState.resources);
+                } else if (gameState.playerStats) {
+                    // Migrate old save format
+                    this.resourceManager.importData({
+                        resources: {
+                            money: 50, // Default starting money
+                            level: gameState.playerStats.level || 1,
+                            xp: gameState.playerStats.xp || 0,
+                            totalHarvests: gameState.playerStats.totalHarvests || 0
+                        }
+                    });
+                }
+                
+                this.selectedCrop = gameState.selectedCrop || 'wheat';
                 
                 // Restore farm data
                 if (gameState.farmData) {
                     this.farmGrid.restoreFromData(gameState.farmData);
                 }
                 
-                // Update UI
+                // Update UI and crop buttons
                 this.updateUI();
+                this.createCropButtons();
                 
                 // Select the saved crop
-                document.querySelectorAll('.crop-btn').forEach(btn => {
-                    btn.classList.toggle('selected', btn.dataset.crop === this.selectedCrop);
-                });
+                setTimeout(() => {
+                    document.querySelectorAll('.crop-btn').forEach(btn => {
+                        btn.classList.toggle('selected', btn.dataset.crop === this.selectedCrop);
+                    });
+                }, 100);
                 
                 this.addMessage(`Welcome back! Your farm has been restored! 🌾`, 'welcome');
             } catch (e) {
                 console.error('Failed to load game state:', e);
+                this.addMessage(`Failed to load save data. Starting fresh! 🌱`, 'welcome');
             }
         }
     }
     
     resetGame() {
-        this.playerStats = {
-            level: 1,
-            xp: 0,
-            totalHarvests: 0
-        };
-        this.selectedCrop = 'tomatoes';
+        this.resourceManager.reset();
+        this.selectedCrop = 'wheat';
         localStorage.removeItem('voiceFarmGame');
         
         this.farmGrid.reset();
         this.updateUI();
+        this.createCropButtons();
         
-        document.querySelectorAll('.crop-btn').forEach(btn => {
-            btn.classList.toggle('selected', btn.dataset.crop === 'tomatoes');
-        });
+        setTimeout(() => {
+            document.querySelectorAll('.crop-btn').forEach(btn => {
+                btn.classList.toggle('selected', btn.dataset.crop === 'wheat');
+            });
+        }, 100);
         
         this.addMessage(`Farm reset! Start your cozy farming journey! 🌱`, 'welcome');
     }

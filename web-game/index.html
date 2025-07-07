@@ -13,6 +13,10 @@
         <header class="game-header">
             <h1>🌾 Voice Farm Game</h1>
             <div class="player-stats">
+                <div class="stat money">
+                    <span class="stat-label">💰 Money</span>
+                    <span class="stat-value" id="player-money">50</span>
+                </div>
                 <div class="stat">
                     <span class="stat-label">Level</span>
                     <span class="stat-value" id="player-level">1</span>
@@ -45,27 +49,8 @@
                 <!-- Crop Selection -->
                 <div class="crop-selection">
                     <h4>Select Crop to Plant:</h4>
-                    <div class="crop-buttons">
-                        <button class="crop-btn" data-crop="tomatoes">
-                            🍅 Tomatoes<br>
-                            <small>4h • 10 XP</small>
-                        </button>
-                        <button class="crop-btn" data-crop="carrots">
-                            🥕 Carrots<br>
-                            <small>3h • 8 XP</small>
-                        </button>
-                        <button class="crop-btn" data-crop="corn">
-                            🌽 Corn<br>
-                            <small>6h • 15 XP</small>
-                        </button>
-                        <button class="crop-btn" data-crop="strawberries">
-                            🍓 Strawberries<br>
-                            <small>5h • 12 XP</small>
-                        </button>
-                        <button class="crop-btn" data-crop="lettuce">
-                            🥬 Lettuce<br>
-                            <small>2h • 6 XP</small>
-                        </button>
+                    <div class="crop-buttons" id="crop-buttons-container">
+                        <!-- Crop buttons will be dynamically generated -->
                     </div>
                 </div>
 
@@ -120,6 +105,8 @@
         </audio>
     </div>
 
+    <script src="CropManager.js"></script>
+    <script src="ResourceManager.js"></script>
     <script src="Plot.js"></script>
     <script src="FarmGrid.js"></script>
     <script src="game.js"></script>

@@ -236,11 +236,49 @@ body {
     transform: scale(1.05);
 }
 
+.crop-btn.disabled {
+    background: #F0F0F0;
+    border-color: #CCC;
+    color: #999;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.crop-btn.disabled:hover {
+    background: #F0F0F0;
+    transform: none;
+    box-shadow: none;
+}
+
 .crop-btn small {
     display: block;
     margin-top: 5px;
     color: #666;
     font-size: 0.8rem;
+}
+
+.crop-btn .profit {
+    color: #228B22;
+    font-weight: 600;
+}
+
+.stat.money {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    border-color: #DAA520;
+}
+
+.stat.money .stat-value {
+    color: #B8860B;
+}
+
+.stat-value.updated {
+    animation: moneyUpdate 0.5s ease;
+}
+
+@keyframes moneyUpdate {
+    0% { transform: scale(1); color: inherit; }
+    50% { transform: scale(1.1); color: #228B22; }
+    100% { transform: scale(1); color: inherit; }
 }
 
 .action-buttons {
@@ -368,6 +406,13 @@ body {
     color: #B8860B;
     font-weight: 700;
     font-size: 1.1rem;
+}
+
+.message.error {
+    background: linear-gradient(45deg, #FFB6C1, #FFF0F5);
+    border: 2px solid #FF69B4;
+    color: #8B0000;
+    font-weight: 600;
 }
 
 @keyframes slideIn {
