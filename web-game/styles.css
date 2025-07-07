@@ -1,0 +1,433 @@
+/* 🌾 Voice Farm Game - Web Edition Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #87CEEB 0%, #98FB98 50%, #F0E68C 100%);
+    min-height: 100vh;
+    color: #2F4F2F;
+}
+
+.game-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header Styles */
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.game-header h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.5rem;
+    color: #228B22;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.player-stats {
+    display: flex;
+    gap: 30px;
+}
+
+.stat {
+    text-align: center;
+    background: #F0FFF0;
+    padding: 15px 20px;
+    border-radius: 15px;
+    border: 3px solid #90EE90;
+    min-width: 80px;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #556B2F;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #228B22;
+}
+
+/* Main Game Layout */
+.game-main {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 30px;
+    margin-bottom: 20px;
+}
+
+/* Farm Container */
+.farm-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.farm-container h2 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.8rem;
+    color: #228B22;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.farm-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.farm-plot {
+    width: 80px;
+    height: 80px;
+    border: 3px solid #8FBC8F;
+    border-radius: 15px;
+    background: #F5F5DC;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.farm-plot:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.farm-plot.empty {
+    background: #F5F5DC;
+    border-color: #DDD;
+}
+
+.farm-plot.planted {
+    background: #8B4513;
+    border-color: #654321;
+}
+
+.farm-plot.growing {
+    background: linear-gradient(45deg, #228B22, #32CD32);
+    border-color: #228B22;
+}
+
+.farm-plot.ready {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    border-color: #FF8C00;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+.farm-plot.harvested {
+    background: #DDD;
+    border-color: #AAA;
+    opacity: 0.6;
+}
+
+@keyframes glow {
+    from { box-shadow: 0 0 10px #FFD700; }
+    to { box-shadow: 0 0 20px #FF8C00, 0 0 30px #FFD700; }
+}
+
+.crop-icon {
+    font-size: 2rem;
+    margin-bottom: 2px;
+}
+
+.crop-timer {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #2F4F2F;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 2px 6px;
+    border-radius: 8px;
+    position: absolute;
+    bottom: 4px;
+    font-family: monospace;
+}
+
+/* Control Panel */
+.control-panel {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    height: fit-content;
+}
+
+.control-panel h3 {
+    font-family: 'Fredoka One', cursive;
+    color: #228B22;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.control-panel h4 {
+    color: #556B2F;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.crop-selection {
+    margin-bottom: 25px;
+}
+
+.crop-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.crop-btn {
+    padding: 15px 10px;
+    border: 3px solid #90EE90;
+    border-radius: 15px;
+    background: #F0FFF0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    color: #2F4F2F;
+    text-align: center;
+}
+
+.crop-btn:hover {
+    background: #E6FFE6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.crop-btn.selected {
+    background: #90EE90;
+    border-color: #228B22;
+    color: #0F2F0F;
+    transform: scale(1.05);
+}
+
+.crop-btn small {
+    display: block;
+    margin-top: 5px;
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.action-buttons {
+    margin-bottom: 25px;
+}
+
+.action-btn {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 15px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.water-btn {
+    background: linear-gradient(45deg, #87CEEB, #4682B4);
+    color: white;
+}
+
+.water-btn:hover {
+    background: linear-gradient(45deg, #4682B4, #1E90FF);
+    transform: translateY(-2px);
+}
+
+.harvest-btn {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #8B4513;
+}
+
+.harvest-btn:hover {
+    background: linear-gradient(45deg, #FFA500, #FF8C00);
+    transform: translateY(-2px);
+}
+
+.clear-btn {
+    background: linear-gradient(45deg, #DDD, #AAA);
+    color: #555;
+}
+
+.clear-btn:hover {
+    background: linear-gradient(45deg, #AAA, #888);
+    transform: translateY(-2px);
+}
+
+.instructions {
+    background: #F0FFF0;
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid #90EE90;
+}
+
+.instructions ul {
+    list-style: none;
+    padding: 0;
+}
+
+.instructions li {
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.instructions li:before {
+    content: "🌱";
+    position: absolute;
+    left: 0;
+}
+
+/* Messages Area */
+.message-area {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.messages {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-weight: 500;
+    animation: slideIn 0.5s ease-out;
+}
+
+.message.welcome {
+    background: linear-gradient(45deg, #E6FFE6, #F0FFF0);
+    border: 2px solid #90EE90;
+    color: #228B22;
+}
+
+.message.plant {
+    background: linear-gradient(45deg, #F0E68C, #FFFFE0);
+    border: 2px solid #DAA520;
+    color: #8B7500;
+}
+
+.message.water {
+    background: linear-gradient(45deg, #E0F6FF, #F0F8FF);
+    border: 2px solid #87CEEB;
+    color: #4682B4;
+}
+
+.message.harvest {
+    background: linear-gradient(45deg, #FFE4B5, #FFF8DC);
+    border: 2px solid #DEB887;
+    color: #8B7355;
+}
+
+.message.levelup {
+    background: linear-gradient(45deg, #FFD700, #FFF8DC);
+    border: 2px solid #DAA520;
+    color: #B8860B;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .game-main {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .control-panel {
+        order: -1;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-header {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .game-header h1 {
+        font-size: 2rem;
+    }
+    
+    .player-stats {
+        gap: 15px;
+    }
+    
+    .farm-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+    }
+    
+    .farm-plot {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .crop-icon {
+        font-size: 1.5rem;
+    }
+    
+    .crop-buttons {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+} 
