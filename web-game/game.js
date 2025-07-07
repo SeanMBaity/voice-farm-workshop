@@ -4,7 +4,7 @@ class VoiceFarmGame {
     constructor() {
         this.selectedCrop = 'tomatoes';
         this.farm = {
-            plots: Array(18).fill(null), // 6x3 grid
+            plots: Array(25).fill(null), // 5x5 grid
             level: 1,
             xp: 0,
             totalHarvests: 0
@@ -80,7 +80,7 @@ class VoiceFarmGame {
         const farmGrid = document.getElementById('farm-grid');
         farmGrid.innerHTML = '';
         
-        for (let i = 0; i < 18; i++) {
+        for (let i = 0; i < 25; i++) {
             const plot = document.createElement('div');
             plot.className = 'farm-plot empty';
             plot.dataset.plotIndex = i;
@@ -407,7 +407,7 @@ class VoiceFarmGame {
     
     resetGame() {
         this.farm = {
-            plots: Array(18).fill(null),
+            plots: Array(25).fill(null),
             level: 1,
             xp: 0,
             totalHarvests: 0
