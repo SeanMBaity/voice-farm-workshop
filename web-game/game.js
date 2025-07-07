@@ -379,10 +379,13 @@ class VoiceFarmGame {
     }
     
     clearHarvestedCrops() {
-        const clearedCount = this.farmGrid.clearHarvestedCrops();
+        const clearedCount = this.farmGrid.clearAllPlots();
         
         if (clearedCount > 0) {
+            this.addMessage(`Cleared ${clearedCount} plots! 🧹`, 'system');
             this.saveGameState(false); // Auto-save
+        } else {
+            this.addMessage('No plots to clear! 🧹', 'system');
         }
     }
     
@@ -742,7 +745,7 @@ class KeyboardShortcutManager {
         // Action shortcuts
         this.shortcuts.set('w', { action: () => this.game.waterAllCrops(), description: 'Water All Crops' });
         this.shortcuts.set('h', { action: () => this.game.harvestAllCrops(), description: 'Harvest All Crops' });
-        this.shortcuts.set('c', { action: () => this.game.clearHarvestedCrops(), description: 'Clear Harvested Plots' });
+        this.shortcuts.set('c', { action: () => this.game.clearHarvestedCrops(), description: 'Clear All Plots' });
         this.shortcuts.set('s', { action: () => this.game.saveGameState(true), description: 'Save Game' });
         
         // Navigation shortcuts
@@ -1096,7 +1099,7 @@ class KeyboardShortcutManager {
             <div style="margin-bottom: 15px;">
                 <strong>W:</strong> Water all crops<br>
                 <strong>H:</strong> Harvest all ready crops<br>
-                <strong>C:</strong> Clear harvested plots<br>
+                <strong>C:</strong> Clear all plots<br>
                 <strong>S:</strong> Save game<br>
                 <strong>P:</strong> Quick plant on empty plots
             </div>

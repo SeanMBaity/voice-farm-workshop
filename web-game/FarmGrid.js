@@ -155,6 +155,21 @@ class FarmGrid {
         return clearedCount;
     }
     
+    clearAllPlots() {
+        let clearedCount = 0;
+        
+        this.plots.forEach(plot => {
+            if (plot.state !== 'empty') {
+                plot.crop = null;
+                plot.state = 'empty';
+                plot.updateDisplay();
+                clearedCount++;
+            }
+        });
+        
+        return clearedCount;
+    }
+    
     updateGrowth() {
         let readyCount = 0;
         

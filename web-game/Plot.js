@@ -57,9 +57,6 @@ class Plot {
             case 'ready':
                 hintText = 'Click to harvest';
                 break;
-            case 'harvested':
-                hintText = 'Ready to clear';
-                break;
         }
         
         if (hintText && !this.element.querySelector('.action-hint')) {
@@ -133,8 +130,9 @@ class Plot {
             name: config.name
         };
         
-        this.crop.status = 'harvested';
-        this.state = 'harvested';
+        // Auto-clear the plot after harvesting
+        this.crop = null;
+        this.state = 'empty';
         this.updateDisplay();
         
         return harvestResult;
@@ -165,7 +163,7 @@ class Plot {
     updateDisplay() {
         if (!this.crop) {
             this.element.className = 'farm-plot empty';
-            this.element.innerHTML = '<div class="crop-icon">🌱</div>';
+            this.element.innerHTML = '<div class="crop-icon">🟫</div><div class="crop-timer">Empty</div>';
             return;
         }
         
@@ -188,11 +186,6 @@ class Plot {
                 icon = config.icon;
                 className = 'farm-plot ready';
                 timer = 'Ready!';
-                break;
-            case 'harvested':
-                icon = '✅';
-                className = 'farm-plot harvested';
-                timer = 'Harvested';
                 break;
         }
         
