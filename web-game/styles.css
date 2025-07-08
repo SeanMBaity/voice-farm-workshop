@@ -362,87 +362,6 @@ body {
     left: 0;
 }
 
-/* Messages Area */
-.message-area {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 20px;
-    padding: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(10px);
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.messages {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.message {
-    padding: 12px 18px;
-    border-radius: 12px;
-    font-weight: 500;
-    animation: slideIn 0.5s ease-out;
-}
-
-.message.welcome {
-    background: linear-gradient(45deg, #E6FFE6, #F0FFF0);
-    border: 2px solid #90EE90;
-    color: #228B22;
-}
-
-.message.plant {
-    background: linear-gradient(45deg, #F0E68C, #FFFFE0);
-    border: 2px solid #DAA520;
-    color: #8B7500;
-}
-
-.message.water {
-    background: linear-gradient(45deg, #E0F6FF, #F0F8FF);
-    border: 2px solid #87CEEB;
-    color: #4682B4;
-}
-
-.message.harvest {
-    background: linear-gradient(45deg, #FFE4B5, #FFF8DC);
-    border: 2px solid #DEB887;
-    color: #8B7355;
-}
-
-.message.levelup {
-    background: linear-gradient(45deg, #FFD700, #FFF8DC);
-    border: 2px solid #DAA520;
-    color: #B8860B;
-    font-weight: 700;
-    font-size: 1.1rem;
-}
-
-.message.error {
-    background: linear-gradient(45deg, #FFB6C1, #FFF0F5);
-    border: 2px solid #FF69B4;
-    color: #8B0000;
-    font-weight: 600;
-}
-
-.message.system {
-    background: linear-gradient(45deg, #E6E6FA, #F0F8FF);
-    border: 2px solid #9370DB;
-    color: #4B0082;
-    font-weight: 500;
-    font-size: 0.9rem;
-}
-
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
 /* Responsive Design */
 @media (max-width: 1200px) {
@@ -560,15 +479,6 @@ body {
         font-size: 1.6rem;
     }
     
-    /* Improve message visibility on mobile */
-    .message-area {
-        margin-top: 15px;
-    }
-    
-    .message {
-        padding: 15px 20px;
-        font-size: 1.1rem;
-    }
 }
 
 /* Loading Animation */
@@ -611,9 +521,6 @@ body {
     touch-action: manipulation;
 }
 
-.mobile-device .message-area {
-    -webkit-overflow-scrolling: touch;
-}
 
 /* Prevent pinch zoom */
 .mobile-device {

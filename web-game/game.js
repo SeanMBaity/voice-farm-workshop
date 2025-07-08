@@ -464,19 +464,9 @@ class VoiceFarmGame {
     }
     
     addMessage(text, type = 'welcome') {
-        const messagesContainer = document.getElementById('game-messages');
-        const message = document.createElement('div');
-        message.className = `message ${type}`;
-        message.textContent = text;
-        
-        messagesContainer.appendChild(message);
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        
-        // Remove old messages to prevent overflow
-        const messages = messagesContainer.children;
-        if (messages.length > 10) {
-            messagesContainer.removeChild(messages[0]);
-        }
+        // Message area removed - this is now a no-op
+        // Messages are logged to console instead
+        console.log(`[${type.toUpperCase()}] ${text}`);
     }
     
     startAdvancedGameLoop() {
