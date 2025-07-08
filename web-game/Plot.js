@@ -114,12 +114,13 @@ class Plot {
         }
         
         // Add simple watering animation that's actually visible
+        alert('WATERING PLOT ' + this.index + '!');
         this.element.classList.add('being-watered');
         
-        // Remove the animation class after 1.5 seconds
+        // Remove the animation class after 3 seconds
         setTimeout(() => {
             this.element.classList.remove('being-watered');
-        }, 1500);
+        }, 3000);
         
         this.crop.wateredAt = Date.now();
         this.crop.status = 'growing';
