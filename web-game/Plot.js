@@ -117,7 +117,7 @@ class Plot {
         this.element.classList.add('watering');
         setTimeout(() => {
             this.element.classList.remove('watering');
-        }, 600);
+        }, 1000);
         
         this.crop.wateredAt = Date.now();
         this.crop.status = 'growing';

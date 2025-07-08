@@ -220,20 +220,23 @@ body {
 .farm-plot.planted.watering::after {
     content: '';
     position: absolute;
-    top: -20px;
+    top: -30px;
     left: 50%;
     transform: translateX(-50%);
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     background: 
-        radial-gradient(circle at 20% 20%, #87CEEB 2px, transparent 2px),
-        radial-gradient(circle at 40% 30%, #ADD8E6 1.5px, transparent 1.5px),
-        radial-gradient(circle at 60% 25%, #87CEEB 2px, transparent 2px),
-        radial-gradient(circle at 80% 35%, #B0E0E6 1.5px, transparent 1.5px),
-        radial-gradient(circle at 30% 50%, #87CEEB 1.5px, transparent 1.5px),
-        radial-gradient(circle at 70% 45%, #ADD8E6 2px, transparent 2px);
-    background-size: 8px 8px, 6px 6px, 8px 8px, 6px 6px, 6px 6px, 8px 8px;
-    animation: waterSpray 0.6s ease-out;
+        radial-gradient(circle at 20% 20%, #4A90E2 3px, transparent 3px),
+        radial-gradient(circle at 40% 30%, #87CEEB 2.5px, transparent 2.5px),
+        radial-gradient(circle at 60% 25%, #4A90E2 3px, transparent 3px),
+        radial-gradient(circle at 80% 35%, #ADD8E6 2.5px, transparent 2.5px),
+        radial-gradient(circle at 30% 50%, #87CEEB 2.5px, transparent 2.5px),
+        radial-gradient(circle at 70% 45%, #4A90E2 3px, transparent 3px),
+        radial-gradient(circle at 50% 60%, #ADD8E6 2.5px, transparent 2.5px),
+        radial-gradient(circle at 25% 70%, #87CEEB 2.5px, transparent 2.5px),
+        radial-gradient(circle at 75% 65%, #4A90E2 3px, transparent 3px);
+    background-size: 10px 10px, 8px 8px, 10px 10px, 8px 8px, 8px 8px, 10px 10px, 8px 8px, 8px 8px, 10px 10px;
+    animation: waterSpray 1s ease-out;
     pointer-events: none;
 }
 
@@ -242,13 +245,17 @@ body {
         opacity: 0;
         transform: translateX(-50%) translateY(-10px) scale(0.5);
     }
-    50% {
+    20% {
         opacity: 1;
         transform: translateX(-50%) translateY(-15px) scale(1);
     }
+    70% {
+        opacity: 1;
+        transform: translateX(-50%) translateY(-20px) scale(1.1);
+    }
     100% {
         opacity: 0;
-        transform: translateX(-50%) translateY(-25px) scale(1.2);
+        transform: translateX(-50%) translateY(-30px) scale(1.3);
     }
 }
 
