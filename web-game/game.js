@@ -3,6 +3,7 @@
 class VoiceFarmGame {
     constructor() {
         this.selectedCrop = 'wheat'; // Start with wheat as per requirements
+        this.selectedCropCursor = null; // Track the current crop cursor
         
         // Initialize new management systems
         this.cropManager = new CropManager();
@@ -261,6 +262,7 @@ class VoiceFarmGame {
                 document.querySelectorAll('.crop-btn').forEach(b => b.classList.remove('selected'));
                 button.classList.add('selected');
                 this.selectedCrop = crop.id;
+                this.updateCropCursor(crop);
                 this.addMessage(`Selected ${crop.name} for planting! 🌱 Cost: ${crop.seedCost} coins`, 'plant');
             });
             
@@ -271,6 +273,10 @@ class VoiceFarmGame {
         const wheatButton = container.querySelector('[data-crop="wheat"]');
         if (wheatButton && !wheatButton.classList.contains('disabled') && !wheatButton.classList.contains('locked')) {
             wheatButton.classList.add('selected');
+            const wheatCrop = this.cropManager.getCropDefinition('wheat');
+            if (wheatCrop) {
+                this.updateCropCursor(wheatCrop);
+            }
         }
         
         // Apply visual enhancements
@@ -515,6 +521,31 @@ class VoiceFarmGame {
         }
     }
     
+    updateCropCursor(crop) {
+        this.selectedCropCursor = crop.icon;
+        this.updateEmptyPlotCursors();
+    }
+    
+    updateEmptyPlotCursors() {
+        // Remove any existing crop cursor styles
+        const existingStyle = document.getElementById('crop-cursor-style');
+        if (existingStyle) {
+            existingStyle.remove();
+        }
+        
+        if (this.selectedCropCursor) {
+            // Create CSS for the crop cursor
+            const style = document.createElement('style');
+            style.id = 'crop-cursor-style';
+            style.textContent = `
+                .farm-plot.empty:hover {
+                    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><text x="16" y="24" text-anchor="middle" font-size="20">${this.selectedCropCursor}</text></svg>') 16 16, auto !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
     startAdvancedGameLoop() {
         // The TimerManager now handles the main game loop
         // We just need to start it (already done in setupManagers)
@@ -624,6 +655,12 @@ class VoiceFarmGame {
                     document.querySelectorAll('.crop-btn').forEach(btn => {
                         btn.classList.toggle('selected', btn.dataset.crop === this.selectedCrop);
                     });
+                    
+                    // Update cursor for the selected crop
+                    const selectedCropData = this.cropManager.getCropDefinition(this.selectedCrop);
+                    if (selectedCropData) {
+                        this.updateCropCursor(selectedCropData);
+                    }
                 }, 100);
                 
                 const timeAway = Date.now() - savePackage.timestamp;
@@ -664,6 +701,12 @@ class VoiceFarmGame {
             document.querySelectorAll('.crop-btn').forEach(btn => {
                 btn.classList.toggle('selected', btn.dataset.crop === 'wheat');
             });
+            
+            // Reset cursor to wheat
+            const wheatCrop = this.cropManager.getCropDefinition('wheat');
+            if (wheatCrop) {
+                this.updateCropCursor(wheatCrop);
+            }
         }, 100);
         
         // Re-enable auto-save
