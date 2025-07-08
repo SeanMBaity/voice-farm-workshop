@@ -113,19 +113,41 @@ class Plot {
             return false;
         }
         
-        // Add watering animation
-        console.log('Adding watering animation to plot', this.index);
-        this.element.classList.add('watering');
-        setTimeout(() => {
-            this.element.classList.remove('watering');
-            console.log('Removed watering animation from plot', this.index);
-        }, 1500);
+        // Add watering sprite animation
+        console.log('Starting watering sprite animation for plot', this.index);
+        this.playWaterAnimation();
         
         this.crop.wateredAt = Date.now();
         this.crop.status = 'growing';
         this.state = 'growing';
         this.updateDisplay();
         return true;
+    }
+    
+    playWaterAnimation() {
+        // Create water sprite element
+        const waterSprite = document.createElement('div');
+        waterSprite.className = 'water-sprite';
+        this.element.appendChild(waterSprite);
+        
+        // Play through animation stages
+        let stage = 1;
+        const maxStages = 5;
+        
+        const playStage = () => {
+            if (stage <= maxStages) {
+                waterSprite.className = `water-sprite stage-${stage}`;
+                console.log(`Playing water animation stage ${stage}`);
+                stage++;
+                setTimeout(playStage, 300); // 300ms per stage
+            } else {
+                // Animation complete, remove sprite
+                console.log('Water animation complete, removing sprite');
+                waterSprite.remove();
+            }
+        };
+        
+        playStage();
     }
     
     harvest() {

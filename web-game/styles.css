@@ -211,62 +211,97 @@ body {
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><defs><linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23E8E8E8;stop-opacity:1"/><stop offset="30%" style="stop-color:%23F5F5F5;stop-opacity:1"/><stop offset="70%" style="stop-color:%23C0C0C0;stop-opacity:1"/><stop offset="100%" style="stop-color:%23A0A0A0;stop-opacity:1"/></linearGradient><linearGradient id="silverDark" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23C0C0C0;stop-opacity:1"/><stop offset="50%" style="stop-color:%23A0A0A0;stop-opacity:1"/><stop offset="100%" style="stop-color:%23808080;stop-opacity:1"/></linearGradient></defs><g><ellipse cx="45" cy="55" rx="14" ry="18" fill="url(%23silver)" stroke="%23808080" stroke-width="2"/><ellipse cx="45" cy="40" rx="12" ry="3" fill="url(%23silver)" stroke="%23808080" stroke-width="1.5"/><path d="M20 50 Q15 45 12 50 Q15 55 20 50" fill="none" stroke="url(%23silverDark)" stroke-width="3" stroke-linecap="round"/><path d="M59 45 Q70 35 80 40 Q85 42 88 45" fill="none" stroke="url(%23silverDark)" stroke-width="3" stroke-linecap="round"/><circle cx="88" cy="45" r="2" fill="url(%23silverDark)" stroke="%23606060" stroke-width="1"/><circle cx="72" cy="42" r="1" fill="%2387CEEB"/><circle cx="76" cy="46" r="1" fill="%2387CEEB"/><circle cx="80" cy="50" r="1" fill="%2387CEEB"/><circle cx="84" cy="54" r="1" fill="%2387CEEB"/></g></svg>') 48 48, crosshair;
 }
 
-/* Watering animation effects */
-.farm-plot.watering {
-    position: relative;
-    overflow: visible;
-}
-
-.farm-plot.watering::after {
-    content: '';
+/* Watering animation effects with sprite sheet */
+.water-sprite {
     position: absolute;
-    top: -40px;
+    width: 100px;
+    height: 100px;
+    top: -50px;
     left: 50%;
     transform: translateX(-50%);
-    width: 80px;
-    height: 80px;
-    background: 
-        /* Large water droplets */
-        radial-gradient(circle at 20% 20%, #0066CC 4px, transparent 4px),
-        radial-gradient(circle at 40% 30%, #4A90E2 3px, transparent 3px),
-        radial-gradient(circle at 60% 25%, #0066CC 4px, transparent 4px),
-        radial-gradient(circle at 80% 35%, #87CEEB 3px, transparent 3px),
-        radial-gradient(circle at 30% 50%, #4A90E2 3px, transparent 3px),
-        radial-gradient(circle at 70% 45%, #0066CC 4px, transparent 4px),
-        radial-gradient(circle at 50% 60%, #87CEEB 3px, transparent 3px),
-        radial-gradient(circle at 25% 70%, #4A90E2 3px, transparent 3px),
-        radial-gradient(circle at 75% 65%, #0066CC 4px, transparent 4px),
-        /* Medium droplets */
-        radial-gradient(circle at 35% 40%, #ADD8E6 2px, transparent 2px),
-        radial-gradient(circle at 65% 55%, #B0E0E6 2px, transparent 2px),
-        radial-gradient(circle at 45% 75%, #ADD8E6 2px, transparent 2px);
-    background-size: 12px 12px, 10px 10px, 12px 12px, 10px 10px, 10px 10px, 12px 12px, 10px 10px, 10px 10px, 12px 12px, 8px 8px, 8px 8px, 8px 8px;
-    animation: waterSpray 1.5s ease-out;
     pointer-events: none;
-    z-index: 10;
+    z-index: 100;
+    font-size: 0;
 }
 
-@keyframes waterSpray {
-    0% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-10px) scale(0.3);
-    }
-    10% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(-15px) scale(0.8);
-    }
-    30% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(-20px) scale(1);
-    }
-    70% {
-        opacity: 1;
-        transform: translateX(-50%) translateY(-25px) scale(1.1);
-    }
-    100% {
-        opacity: 0;
-        transform: translateX(-50%) translateY(-35px) scale(1.4);
-    }
+.water-sprite.stage-1::after {
+    content: '💧💧💧';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 20px;
+    animation: waterDrop1 0.3s ease-out;
+}
+
+.water-sprite.stage-2::after {
+    content: '💧💧💧💧💧';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+    animation: waterDrop2 0.3s ease-out;
+}
+
+.water-sprite.stage-3::after {
+    content: '💧💧💧💧💧💧💧';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+    animation: waterDrop3 0.3s ease-out;
+}
+
+.water-sprite.stage-4::after {
+    content: '💧💧💧💧💧💧💧💧💧';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    animation: waterDrop4 0.3s ease-out;
+}
+
+.water-sprite.stage-5::after {
+    content: '💧💧💧💧💧💧💧💧💧💧💧';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    animation: waterDrop5 0.3s ease-out;
+}
+
+@keyframes waterDrop1 {
+    0% { transform: translateX(-50%) translateY(-10px) scale(0.5); opacity: 0; }
+    50% { transform: translateX(-50%) translateY(-15px) scale(1); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-20px) scale(1.1); opacity: 0.8; }
+}
+
+@keyframes waterDrop2 {
+    0% { transform: translateX(-50%) translateY(-15px) scale(0.7); opacity: 0.8; }
+    50% { transform: translateX(-50%) translateY(-20px) scale(1.1); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-25px) scale(1.2); opacity: 0.6; }
+}
+
+@keyframes waterDrop3 {
+    0% { transform: translateX(-50%) translateY(-20px) scale(0.9); opacity: 0.6; }
+    50% { transform: translateX(-50%) translateY(-25px) scale(1.2); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-30px) scale(1.3); opacity: 0.4; }
+}
+
+@keyframes waterDrop4 {
+    0% { transform: translateX(-50%) translateY(-25px) scale(1.1); opacity: 0.4; }
+    50% { transform: translateX(-50%) translateY(-30px) scale(1.3); opacity: 0.8; }
+    100% { transform: translateX(-50%) translateY(-35px) scale(1.4); opacity: 0.2; }
+}
+
+@keyframes waterDrop5 {
+    0% { transform: translateX(-50%) translateY(-30px) scale(1.3); opacity: 0.2; }
+    50% { transform: translateX(-50%) translateY(-35px) scale(1.4); opacity: 0.6; }
+    100% { transform: translateX(-50%) translateY(-40px) scale(1.5); opacity: 0; }
 }
 
 .farm-plot.growing {
