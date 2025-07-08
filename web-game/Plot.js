@@ -113,6 +113,12 @@ class Plot {
             return false;
         }
         
+        // Add watering animation
+        this.element.classList.add('watering');
+        setTimeout(() => {
+            this.element.classList.remove('watering');
+        }, 600);
+        
         this.crop.wateredAt = Date.now();
         this.crop.status = 'growing';
         this.state = 'growing';
