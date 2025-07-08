@@ -231,10 +231,6 @@ class VoiceFarmGame {
                         ${crop.icon}
                         ${crop.isLocked ? '<div class="lock-overlay">🔒</div>' : ''}
                     </div>
-                    <div class="crop-name">${crop.name}</div>
-                    <div class="crop-details">
-                        <small>💰${crop.seedCost} • ${growthTimeDisplay}s • ${crop.xpReward} XP</small>
-                    </div>
                 </div>
             `;
             
@@ -242,11 +238,13 @@ class VoiceFarmGame {
             
             if (crop.isLocked) {
                 button.classList.add('locked');
-                button.title = `Unlocks at level ${crop.unlockLevel}`;
+                button.title = `${crop.name} - Unlocks at level ${crop.unlockLevel}`;
                 button.disabled = true;
             } else if (!canAfford) {
                 button.classList.add('disabled');
-                button.title = `Insufficient funds. Need ${crop.seedCost} coins.`;
+                button.title = `${crop.name} - Need ${crop.seedCost} coins`;
+            } else {
+                button.title = `${crop.name} - ${crop.seedCost} coins`;
             }
             
             button.addEventListener('click', () => {
