@@ -222,13 +222,11 @@ class VoiceFarmGame {
             button.dataset.crop = crop.id;
             
             const canAfford = this.resourceManager.canAfford('money', crop.seedCost);
-            const profit = this.cropManager.calculateProfit(crop.id);
             const growthTimeDisplay = (crop.growthTime / 1000).toFixed(0);
             
             button.innerHTML = `
                 ${crop.icon} ${crop.name}<br>
-                <small>💰${crop.seedCost} • ${growthTimeDisplay}s • ${crop.xpReward} XP</small><br>
-                <small class="profit">Profit: +${profit}</small>
+                <small>💰${crop.seedCost} • ${growthTimeDisplay}s • ${crop.xpReward} XP</small>
             `;
             
             if (!canAfford) {
