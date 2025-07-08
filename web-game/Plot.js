@@ -174,7 +174,7 @@ class Plot {
             case 'planted':
                 icon = config.plantedIcon;
                 className = 'farm-plot planted';
-                timer = 'Needs water';
+                timer = '';
                 break;
             case 'growing':
                 icon = config.growingIcon;
@@ -192,7 +192,7 @@ class Plot {
         this.element.className = className;
         this.element.innerHTML = `
             <div class="crop-icon">${icon}</div>
-            <div class="crop-timer">${timer}</div>
+            ${timer ? `<div class="crop-timer">${timer}</div>` : ''}
         `;
     }
     
