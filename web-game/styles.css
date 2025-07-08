@@ -208,7 +208,7 @@ body {
         100% 100%;
     border-color: #4A2C2A;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
-    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="%23555"><path d="M3 8h8v2H3z"/><path d="M5 6h4v2H5z"/><circle cx="15" cy="10" r="3" fill="%2387CEEB" stroke="%234682B4" stroke-width="1"/><path d="M15 13v6c0 1-1 2-2 2s-2-1-2-2v-6h4z" fill="%23A0522D"/><path d="M14 20h2v1h-2z" fill="%23654321"/><circle cx="12" cy="16" r="0.5" fill="%23ADD8E6"/><circle cx="16" cy="17" r="0.5" fill="%23ADD8E6"/><circle cx="14" cy="18" r="0.5" fill="%23ADD8E6"/></g></svg>') 12 12, crosshair;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><g fill="%23555"><path d="M6 16h16v4H6z"/><path d="M10 12h8v4h-8z"/><circle cx="30" cy="20" r="6" fill="%2387CEEB" stroke="%234682B4" stroke-width="2"/><path d="M30 26v12c0 2-2 4-4 4s-4-2-4-4V26h8z" fill="%23A0522D"/><path d="M28 40h4v2h-4z" fill="%23654321"/><circle cx="24" cy="32" r="1" fill="%23ADD8E6"/><circle cx="32" cy="34" r="1" fill="%23ADD8E6"/><circle cx="28" cy="36" r="1" fill="%23ADD8E6"/></g></svg>') 24 24, crosshair;
 }
 
 .farm-plot.growing {
