@@ -297,7 +297,12 @@ class VoiceFarmGame {
     }
     
     handlePlotClick(plotIndex, plotState) {
-        if (plotState === 'empty') {
+        const plot = this.farmGrid.plots[plotIndex];
+        
+        if (plot.isLocked) {
+            // Locked plot - offer to purchase
+            this.purchasePlot(plotIndex);
+        } else if (plotState === 'empty') {
             // Empty plot - plant crop
             this.plantCrop(plotIndex);
         } else if (plotState === 'planted' || plotState === 'growing') {
@@ -306,6 +311,28 @@ class VoiceFarmGame {
         } else if (plotState === 'ready') {
             // Harvest ready crop
             this.harvestCrop(plotIndex);
+        }
+    }
+    
+    purchasePlot(plotIndex) {
+        const plotCost = 100;
+        
+        // Check if player can afford the plot
+        if (!this.resourceManager.canAfford('money', plotCost)) {
+            this.addMessage(`Not enough money to purchase this plot! Need $${plotCost}.`, 'error');
+            return;
+        }
+        
+        // Deduct money and purchase plot
+        const success = this.resourceManager.spendResource('money', plotCost, 'plot_purchase');
+        
+        if (success) {
+            const purchaseSuccess = this.farmGrid.purchasePlot(plotIndex);
+            
+            if (purchaseSuccess) {
+                this.addMessage(`Plot purchased for $${plotCost}! 🏞️ Ready for farming!`, 'purchase');
+                this.saveGameState(false); // Auto-save
+            }
         }
     }
     

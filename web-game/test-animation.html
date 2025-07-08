@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Watering Animation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #f0f0f0;
+        }
+        
+        .test-plot {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #5D4037;
+            background: #8D6E63;
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+            margin: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .test-container {
+            text-align: center;
+        }
+        
+        button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h2>Watering Animation Test</h2>
+        <div class="test-plot" id="test-plot">🌱</div>
+        <button onclick="testWaterAnimation()">Test Water Animation</button>
+        <p>Click the button to test the watering animation</p>
+    </div>
+
+    <script>
+        function testWaterAnimation() {
+            const plot = document.getElementById('test-plot');
+            showWaterAnimation(plot);
+        }
+        
+        function showWaterAnimation(element) {
+            // Create water droplets effect
+            const waterOverlay = document.createElement('div');
+            waterOverlay.style.cssText = `
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at 30% 30%, rgba(135, 206, 235, 0.8) 0%, transparent 60%),
+                            radial-gradient(circle at 70% 40%, rgba(173, 216, 230, 0.6) 0%, transparent 50%),
+                            radial-gradient(circle at 50% 70%, rgba(135, 206, 235, 0.7) 0%, transparent 40%);
+                border-radius: 3px;
+                pointer-events: none;
+                z-index: 1000;
+                animation: waterSplash 1s ease-out forwards;
+            `;
+            
+            // Add keyframe animation via style tag if not already present
+            if (!document.querySelector('#water-animation-styles')) {
+                const style = document.createElement('style');
+                style.id = 'water-animation-styles';
+                style.textContent = `
+                    @keyframes waterSplash {
+                        0% { opacity: 0; transform: scale(0.5); }
+                        50% { opacity: 1; transform: scale(1.2); }
+                        100% { opacity: 0; transform: scale(1); }
+                    }
+                    
+                    @keyframes waterDrops {
+                        0% { opacity: 0; transform: translateY(-10px); }
+                        50% { opacity: 1; transform: translateY(0); }
+                        100% { opacity: 0; transform: translateY(10px); }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            // Add water drops
+            for (let i = 0; i < 5; i++) {
+                const drop = document.createElement('div');
+                drop.style.cssText = `
+                    position: absolute;
+                    width: 6px;
+                    height: 6px;
+                    background: #4682B4;
+                    border-radius: 50%;
+                    top: ${Math.random() * 50 + 20}%;
+                    left: ${Math.random() * 60 + 20}%;
+                    animation: waterDrops ${0.8 + Math.random() * 0.4}s ease-out forwards;
+                    animation-delay: ${Math.random() * 0.3}s;
+                    z-index: 1001;
+                `;
+                waterOverlay.appendChild(drop);
+            }
+            
+            element.appendChild(waterOverlay);
+            
+            // Remove overlay after animation
+            setTimeout(() => {
+                if (waterOverlay.parentNode) {
+                    waterOverlay.parentNode.removeChild(waterOverlay);
+                }
+            }, 1500);
+        }
+    </script>
+</body>
+</html>

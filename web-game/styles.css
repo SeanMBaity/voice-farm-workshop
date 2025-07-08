@@ -211,65 +211,53 @@ body {
     cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><defs><linearGradient id="silver" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23E8E8E8;stop-opacity:1"/><stop offset="30%" style="stop-color:%23F5F5F5;stop-opacity:1"/><stop offset="70%" style="stop-color:%23C0C0C0;stop-opacity:1"/><stop offset="100%" style="stop-color:%23A0A0A0;stop-opacity:1"/></linearGradient><linearGradient id="silverDark" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23C0C0C0;stop-opacity:1"/><stop offset="50%" style="stop-color:%23A0A0A0;stop-opacity:1"/><stop offset="100%" style="stop-color:%23808080;stop-opacity:1"/></linearGradient></defs><g><ellipse cx="45" cy="55" rx="14" ry="18" fill="url(%23silver)" stroke="%23808080" stroke-width="2"/><ellipse cx="45" cy="40" rx="12" ry="3" fill="url(%23silver)" stroke="%23808080" stroke-width="1.5"/><path d="M20 50 Q15 45 12 50 Q15 55 20 50" fill="none" stroke="url(%23silverDark)" stroke-width="3" stroke-linecap="round"/><path d="M59 45 Q70 35 80 40 Q85 42 88 45" fill="none" stroke="url(%23silverDark)" stroke-width="3" stroke-linecap="round"/><circle cx="88" cy="45" r="2" fill="url(%23silverDark)" stroke="%23606060" stroke-width="1"/><circle cx="72" cy="42" r="1" fill="%2387CEEB"/><circle cx="76" cy="46" r="1" fill="%2387CEEB"/><circle cx="80" cy="50" r="1" fill="%2387CEEB"/><circle cx="84" cy="54" r="1" fill="%2387CEEB"/></g></svg>') 48 48, crosshair;
 }
 
-/* EXTREMELY OBVIOUS watering animation */
-.farm-plot.being-watered {
-    background: #FF0000 !important;
-    border: 5px solid #FFFF00 !important;
-    animation: massiveWaterAnimation 3s ease-in-out !important;
-    z-index: 1000 !important;
+.farm-plot.ready {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    border-color: #FF8C00;
+    animation: glow 2s ease-in-out infinite alternate;
+    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96"><defs><linearGradient id="wood" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23D2691E;stop-opacity:1"/><stop offset="50%" style="stop-color:%23CD853F;stop-opacity:1"/><stop offset="100%" style="stop-color:%23A0522D;stop-opacity:1"/></linearGradient><linearGradient id="metal" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:%23E8E8E8;stop-opacity:1"/><stop offset="50%" style="stop-color:%23C0C0C0;stop-opacity:1"/><stop offset="100%" style="stop-color:%23808080;stop-opacity:1"/></linearGradient></defs><g transform="rotate(45 48 48)"><line x1="48" y1="15" x2="48" y2="65" stroke="url(%23wood)" stroke-width="6" stroke-linecap="round"/><line x1="48" y1="15" x2="48" y2="65" stroke="%23654321" stroke-width="4" stroke-linecap="round"/><circle cx="48" cy="17" r="3" fill="%23654321" stroke="%23543A1A" stroke-width="1"/><path d="M43 65 Q40 70 40 78 Q40 86 43 92 Q45 96 48 98 Q51 96 53 92 Q56 86 56 78 Q56 70 53 65 Z" fill="url(%23metal)" stroke="%23666666" stroke-width="1.5"/><path d="M44 67 Q42 71 42 78 Q42 85 44 90 Q46 93 48 94 Q50 93 52 90 Q54 85 54 78 Q54 71 52 67 Z" fill="%23F0F0F0" opacity="0.4"/><ellipse cx="48" cy="63" rx="3" ry="2" fill="%23654321"/></g></svg>') 48 48, crosshair;
 }
 
-.farm-plot.being-watered::after {
-    content: '🌊🌊🌊 WATERING 🌊🌊🌊';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #FFFF00;
-    color: #FF0000;
-    padding: 10px;
-    font-size: 8px;
+/* Water animation styles are now dynamically added by JavaScript */
+
+.farm-plot.locked {
+    background: 
+        linear-gradient(45deg, #8B4513 0%, #A0522D 25%, #CD853F 50%, #D2691E 75%, #8B4513 100%),
+        radial-gradient(circle at 30% 30%, rgba(139, 69, 19, 0.3) 0%, transparent 50%);
+    border: 2px solid #654321;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    opacity: 0.7;
+}
+
+.farm-plot.locked:hover {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    border-color: #8B4513;
+}
+
+.farm-plot.locked .lock-icon {
+    font-size: 1.2rem;
+    color: #FFA500;
+    margin-bottom: 2px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.farm-plot.locked .price-tag {
+    font-size: 0.6rem;
     font-weight: bold;
-    border: 2px solid #FF0000;
-    border-radius: 10px;
-    z-index: 1001;
-    animation: wateringText 3s ease-in-out;
-}
-
-@keyframes massiveWaterAnimation {
-    0% { 
-        background: #FF0000 !important;
-        transform: scale(1) rotate(0deg);
-        border-color: #FFFF00 !important;
-    }
-    25% { 
-        background: #00FF00 !important;
-        transform: scale(1.5) rotate(90deg);
-        border-color: #FF00FF !important;
-    }
-    50% { 
-        background: #0000FF !important;
-        transform: scale(2) rotate(180deg);
-        border-color: #00FFFF !important;
-    }
-    75% { 
-        background: #FF00FF !important;
-        transform: scale(1.5) rotate(270deg);
-        border-color: #FFFF00 !important;
-    }
-    100% { 
-        background: #FF0000 !important;
-        transform: scale(1) rotate(360deg);
-        border-color: #00FF00 !important;
-    }
-}
-
-@keyframes wateringText {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
-    25% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
-    50% { opacity: 1; transform: translate(-50%, -50%) scale(2); }
-    75% { opacity: 1; transform: translate(-50%, -50%) scale(1.5); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(0); }
+    color: #FFFFFF;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 2px 4px;
+    border-radius: 4px;
+    border: 1px solid #FFA500;
+    font-family: monospace;
 }
 
 .farm-plot.growing {
@@ -277,11 +265,6 @@ body {
     border-color: #228B22;
 }
 
-.farm-plot.ready {
-    background: linear-gradient(45deg, #FFD700, #FFA500);
-    border-color: #FF8C00;
-    animation: glow 2s ease-in-out infinite alternate;
-}
 
 .farm-plot.harvested {
     background: #DDD;

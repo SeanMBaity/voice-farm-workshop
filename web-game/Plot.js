@@ -7,6 +7,7 @@ class Plot {
         this.cropConfig = cropConfig;
         this.crop = null;
         this.state = 'empty';
+        this.isLocked = false;
         
         this.setupEventListeners();
     }
@@ -19,7 +20,7 @@ class Plot {
     
     handleClick() {
         if (this.onPlotClick) {
-            this.onPlotClick(this.index, this.state);
+            this.onPlotClick(this.index, this.isLocked ? 'locked' : this.state);
         }
     }
     
@@ -90,7 +91,7 @@ class Plot {
     }
     
     plant(cropType) {
-        if (this.state !== 'empty') return false;
+        if (this.state !== 'empty' || this.isLocked) return false;
         
         const config = this.cropConfig[cropType];
         if (!config) return false;
@@ -113,14 +114,39 @@ class Plot {
             return false;
         }
         
-        // Add simple watering animation that's actually visible
-        alert('WATERING PLOT ' + this.index + '!');
-        this.element.classList.add('being-watered');
+        // Beautiful water animation - blue splash effect
+        this.element.style.backgroundColor = '#87CEEB';
+        this.element.style.border = '3px solid #4169E1';
+        this.element.style.boxShadow = '0 0 20px #87CEEB';
+        this.element.style.transform = 'scale(1.1)';
+        this.element.style.transition = 'all 0.3s ease';
         
-        // Remove the animation class after 3 seconds
+        // Add water droplet text
+        const waterText = document.createElement('div');
+        waterText.innerHTML = '💧';
+        waterText.style.position = 'absolute';
+        waterText.style.top = '50%';
+        waterText.style.left = '50%';
+        waterText.style.transform = 'translate(-50%, -50%)';
+        waterText.style.fontSize = '20px';
+        waterText.style.zIndex = '1000';
+        waterText.style.pointerEvents = 'none';
+        waterText.style.animation = 'bounce 0.6s ease-in-out';
+        
+        this.element.appendChild(waterText);
+        
+        // Reset after animation
         setTimeout(() => {
-            this.element.classList.remove('being-watered');
-        }, 3000);
+            this.element.style.backgroundColor = '';
+            this.element.style.border = '';
+            this.element.style.boxShadow = '';
+            this.element.style.transform = '';
+            this.element.style.transition = '';
+            if (waterText.parentNode) {
+                waterText.parentNode.removeChild(waterText);
+            }
+            this.updateDisplay();
+        }, 800);
         
         this.crop.wateredAt = Date.now();
         this.crop.status = 'growing';
@@ -150,6 +176,7 @@ class Plot {
     clear() {
         this.crop = null;
         this.state = 'empty';
+        // Don't change isLocked status - that's handled by the grid reset
         this.updateDisplay();
         return true;
     }
@@ -168,6 +195,11 @@ class Plot {
     }
     
     updateDisplay() {
+        if (this.isLocked) {
+            // Don't update display for locked plots - they're handled by the grid
+            return;
+        }
+        
         if (!this.crop) {
             this.element.className = 'farm-plot empty';
             this.element.innerHTML = '';

@@ -23,12 +23,28 @@ class FarmGrid {
         
         for (let i = 0; i < this.size; i++) {
             const plotElement = document.createElement('div');
-            plotElement.className = 'farm-plot empty';
-            plotElement.dataset.plotIndex = i;
-            plotElement.innerHTML = '';
+            const row = Math.floor(i / 8);
+            const col = i % 8;
+            
+            // Check if this is in the center 4x4 grid (rows 2-5, cols 2-5)
+            const isStartingPlot = (row >= 2 && row <= 5 && col >= 2 && col <= 5);
+            
+            if (isStartingPlot) {
+                plotElement.className = 'farm-plot empty';
+                plotElement.dataset.plotIndex = i;
+                plotElement.innerHTML = '';
+            } else {
+                plotElement.className = 'farm-plot locked';
+                plotElement.dataset.plotIndex = i;
+                plotElement.innerHTML = `
+                    <div class="lock-icon">🔒</div>
+                    <div class="price-tag">$100</div>
+                `;
+            }
             
             const plot = new Plot(i, plotElement, this.cropConfig);
             plot.onPlotClick = (index, state) => this.handlePlotClick(index, state);
+            plot.isLocked = !isStartingPlot;
             
             this.plots.push(plot);
             this.gridElement.appendChild(plotElement);
@@ -45,10 +61,37 @@ class FarmGrid {
         }
     }
     
+    purchasePlot(plotIndex) {
+        if (plotIndex < 0 || plotIndex >= this.plots.length) return false;
+        
+        const plot = this.plots[plotIndex];
+        if (!plot.isLocked) return false;
+        
+        // Unlock the plot
+        plot.isLocked = false;
+        plot.element.className = 'farm-plot empty';
+        plot.element.innerHTML = '';
+        
+        if (this.onMessage) {
+            this.onMessage('Plot purchased! 🏞️ Ready for farming!', 'purchase');
+        }
+        
+        return true;
+    }
+    
     plantCrop(plotIndex, cropType) {
         if (plotIndex < 0 || plotIndex >= this.plots.length) return false;
         
         const plot = this.plots[plotIndex];
+        
+        // Check if plot is locked
+        if (plot.isLocked) {
+            if (this.onMessage) {
+                this.onMessage('This plot is locked! Purchase it for $100 to start farming!', 'error');
+            }
+            return false;
+        }
+        
         const success = plot.plant(cropType);
         
         if (success && this.onMessage) {
@@ -238,8 +281,32 @@ class FarmGrid {
     }
     
     reset() {
-        this.plots.forEach(plot => plot.clear());
-        this.plots.forEach(plot => plot.updateDisplay());
+        this.plots.forEach((plot, index) => {
+            const row = Math.floor(index / 8);
+            const col = index % 8;
+            
+            // Check if this is in the center 4x4 grid (rows 2-5, cols 2-5)
+            const isStartingPlot = (row >= 2 && row <= 5 && col >= 2 && col <= 5);
+            
+            plot.clear();
+            
+            if (isStartingPlot) {
+                // Keep starting plots unlocked
+                plot.isLocked = false;
+                plot.element.className = 'farm-plot empty';
+                plot.element.innerHTML = '';
+            } else {
+                // Lock all other plots
+                plot.isLocked = true;
+                plot.element.className = 'farm-plot locked';
+                plot.element.innerHTML = `
+                    <div class="lock-icon">🔒</div>
+                    <div class="price-tag">$100</div>
+                `;
+            }
+            
+            plot.updateDisplay();
+        });
     }
     
     getGridStats() {
