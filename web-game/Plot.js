@@ -163,7 +163,7 @@ class Plot {
     updateDisplay() {
         if (!this.crop) {
             this.element.className = 'farm-plot empty';
-            this.element.innerHTML = '<div class="crop-icon">🟫</div><div class="crop-timer">Empty</div>';
+            this.element.innerHTML = '<div class="crop-icon">🟫</div>';
             return;
         }
         

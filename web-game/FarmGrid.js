@@ -5,7 +5,7 @@ class FarmGrid {
         this.gridElement = gridElement;
         this.cropConfig = cropConfig;
         this.plots = [];
-        this.size = 25; // 5x5 grid
+        this.size = 100; // 10x10 grid
         this.onPlotAction = null;
         this.onMessage = null;
         
@@ -25,7 +25,7 @@ class FarmGrid {
             const plotElement = document.createElement('div');
             plotElement.className = 'farm-plot empty';
             plotElement.dataset.plotIndex = i;
-            plotElement.innerHTML = '<div class="crop-icon">🌱</div>';
+            plotElement.innerHTML = '<div class="crop-icon">🟫</div>';
             
             const plot = new Plot(i, plotElement, this.cropConfig);
             plot.onPlotClick = (index, state) => this.handlePlotClick(index, state);

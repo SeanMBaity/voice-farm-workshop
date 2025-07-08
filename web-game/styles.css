@@ -95,17 +95,17 @@ body {
 
 .farm-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 15px;
-    max-width: 500px;
+    grid-template-columns: repeat(10, 1fr);
+    gap: 8px;
+    max-width: 800px;
     margin: 0 auto;
 }
 
 .farm-plot {
-    width: 80px;
-    height: 80px;
-    border: 3px solid #8FBC8F;
-    border-radius: 15px;
+    width: 60px;
+    height: 60px;
+    border: 2px solid #8FBC8F;
+    border-radius: 8px;
     background: #F5F5DC;
     display: flex;
     flex-direction: column;
@@ -161,7 +161,7 @@ body {
 }
 
 .crop-icon {
-    font-size: 2rem;
+    font-size: 1.5rem;
     margin-bottom: 2px;
 }
 
@@ -428,20 +428,21 @@ body {
     }
     
     .farm-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 12px;
+        grid-template-columns: repeat(8, 1fr);
+        gap: 6px;
+        max-width: 600px;
     }
     
     .farm-plot {
-        width: 65px;
-        height: 65px;
+        width: 50px;
+        height: 50px;
         /* Enhanced touch targets for mobile */
         min-height: 44px;
         min-width: 44px;
     }
     
     .crop-icon {
-        font-size: 1.6rem;
+        font-size: 1.2rem;
     }
     
     .crop-buttons {
@@ -596,8 +597,8 @@ body {
 /* Ensure buttons are easily tappable */
 @media (max-width: 768px) {
     .mobile-device .farm-plot {
-        min-width: 60px !important;
-        min-height: 60px !important;
+        min-width: 48px !important;
+        min-height: 48px !important;
     }
     
     .mobile-device .crop-btn {
