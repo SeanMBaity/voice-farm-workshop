@@ -104,14 +104,33 @@ body {
 .farm-plot {
     width: 60px;
     height: 60px;
-    border: 1px solid #654321;
-    border-radius: 4px;
+    border: 1px solid #5D4037;
+    border-radius: 3px;
     background: 
-        radial-gradient(circle at 20% 20%, #654321 1px, transparent 1px),
-        radial-gradient(circle at 80% 80%, #A0522D 1px, transparent 1px),
-        radial-gradient(circle at 40% 60%, #8B4513 1px, transparent 1px),
-        linear-gradient(135deg, #8B4513 0%, #A0522D 25%, #654321 50%, #8B4513 75%, #A0522D 100%);
-    background-size: 8px 8px, 6px 6px, 10px 10px, 100% 100%;
+        /* Small dark soil particles */
+        radial-gradient(circle at 15% 25%, #3E2723 0.5px, transparent 0.5px),
+        radial-gradient(circle at 85% 15%, #4A2C2A 0.5px, transparent 0.5px),
+        radial-gradient(circle at 45% 75%, #5D4037 0.5px, transparent 0.5px),
+        radial-gradient(circle at 75% 45%, #3E2723 0.5px, transparent 0.5px),
+        radial-gradient(circle at 25% 65%, #4A2C2A 0.5px, transparent 0.5px),
+        radial-gradient(circle at 65% 25%, #5D4037 0.5px, transparent 0.5px),
+        /* Medium soil clumps */
+        radial-gradient(circle at 30% 40%, #6D4C41 1px, transparent 1px),
+        radial-gradient(circle at 70% 60%, #5D4037 1px, transparent 1px),
+        radial-gradient(circle at 20% 80%, #8D6E63 1px, transparent 1px),
+        radial-gradient(circle at 80% 20%, #6D4C41 1px, transparent 1px),
+        /* Larger dirt clumps */
+        radial-gradient(circle at 60% 40%, #8D6E63 1.5px, transparent 1.5px),
+        radial-gradient(circle at 40% 20%, #6D4C41 1.5px, transparent 1.5px),
+        /* Base dirt color with natural variation */
+        linear-gradient(45deg, #8D6E63 0%, #6D4C41 25%, #5D4037 50%, #6D4C41 75%, #8D6E63 100%),
+        /* Subtle texture overlay */
+        linear-gradient(135deg, rgba(139, 110, 99, 0.3) 0%, rgba(93, 64, 55, 0.3) 50%, rgba(109, 76, 65, 0.3) 100%);
+    background-size: 
+        4px 4px, 5px 5px, 6px 6px, 7px 7px, 8px 8px, 9px 9px,
+        12px 12px, 14px 14px, 16px 16px, 18px 18px,
+        20px 20px, 22px 22px,
+        100% 100%, 100% 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -120,12 +139,16 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .farm-plot:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 2px rgba(0, 0, 0, 0.25);
     z-index: 1;
+    border-color: #4A2C2A;
 }
 
 .farm-plot:active {
@@ -135,17 +158,56 @@ body {
 
 .farm-plot.empty {
     background: 
-        radial-gradient(circle at 20% 20%, #654321 1px, transparent 1px),
-        radial-gradient(circle at 80% 80%, #A0522D 1px, transparent 1px),
-        radial-gradient(circle at 40% 60%, #8B4513 1px, transparent 1px),
-        linear-gradient(135deg, #8B4513 0%, #A0522D 25%, #654321 50%, #8B4513 75%, #A0522D 100%);
-    background-size: 8px 8px, 6px 6px, 10px 10px, 100% 100%;
-    border-color: #654321;
+        /* Small dark soil particles */
+        radial-gradient(circle at 15% 25%, #3E2723 0.5px, transparent 0.5px),
+        radial-gradient(circle at 85% 15%, #4A2C2A 0.5px, transparent 0.5px),
+        radial-gradient(circle at 45% 75%, #5D4037 0.5px, transparent 0.5px),
+        radial-gradient(circle at 75% 45%, #3E2723 0.5px, transparent 0.5px),
+        radial-gradient(circle at 25% 65%, #4A2C2A 0.5px, transparent 0.5px),
+        radial-gradient(circle at 65% 25%, #5D4037 0.5px, transparent 0.5px),
+        /* Medium soil clumps */
+        radial-gradient(circle at 30% 40%, #6D4C41 1px, transparent 1px),
+        radial-gradient(circle at 70% 60%, #5D4037 1px, transparent 1px),
+        radial-gradient(circle at 20% 80%, #8D6E63 1px, transparent 1px),
+        radial-gradient(circle at 80% 20%, #6D4C41 1px, transparent 1px),
+        /* Larger dirt clumps */
+        radial-gradient(circle at 60% 40%, #8D6E63 1.5px, transparent 1.5px),
+        radial-gradient(circle at 40% 20%, #6D4C41 1.5px, transparent 1.5px),
+        /* Base dirt color with natural variation */
+        linear-gradient(45deg, #8D6E63 0%, #6D4C41 25%, #5D4037 50%, #6D4C41 75%, #8D6E63 100%),
+        /* Subtle texture overlay */
+        linear-gradient(135deg, rgba(139, 110, 99, 0.3) 0%, rgba(93, 64, 55, 0.3) 50%, rgba(109, 76, 65, 0.3) 100%);
+    background-size: 
+        4px 4px, 5px 5px, 6px 6px, 7px 7px, 8px 8px, 9px 9px,
+        12px 12px, 14px 14px, 16px 16px, 18px 18px,
+        20px 20px, 22px 22px,
+        100% 100%, 100% 100%;
+    border-color: #5D4037;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .farm-plot.planted {
-    background: #8B4513;
-    border-color: #654321;
+    background: 
+        /* Darker, more compact soil for planted areas */
+        radial-gradient(circle at 15% 25%, #2E1A14 0.5px, transparent 0.5px),
+        radial-gradient(circle at 85% 15%, #3E2723 0.5px, transparent 0.5px),
+        radial-gradient(circle at 45% 75%, #4A2C2A 0.5px, transparent 0.5px),
+        radial-gradient(circle at 75% 45%, #2E1A14 0.5px, transparent 0.5px),
+        radial-gradient(circle at 25% 65%, #3E2723 0.5px, transparent 0.5px),
+        radial-gradient(circle at 65% 25%, #4A2C2A 0.5px, transparent 0.5px),
+        /* Medium soil clumps - darker */
+        radial-gradient(circle at 30% 40%, #5D4037 1px, transparent 1px),
+        radial-gradient(circle at 70% 60%, #4A2C2A 1px, transparent 1px),
+        radial-gradient(circle at 20% 80%, #6D4C41 1px, transparent 1px),
+        radial-gradient(circle at 80% 20%, #5D4037 1px, transparent 1px),
+        /* Base planted soil color */
+        linear-gradient(45deg, #6D4C41 0%, #5D4037 25%, #4A2C2A 50%, #5D4037 75%, #6D4C41 100%);
+    background-size: 
+        4px 4px, 5px 5px, 6px 6px, 7px 7px, 8px 8px, 9px 9px,
+        12px 12px, 14px 14px, 16px 16px, 18px 18px,
+        100% 100%;
+    border-color: #4A2C2A;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
 .farm-plot.growing {
