@@ -212,11 +212,11 @@ class VoiceFarmGame {
     createCropButtons() {
         const container = document.getElementById('crop-buttons-container');
         const playerLevel = this.resourceManager.getResource('level');
-        const availableCrops = this.cropManager.getCropsForLevel(playerLevel);
+        const allCrops = this.cropManager.getAllCropsWithLockStatus(playerLevel);
         
         container.innerHTML = '';
         
-        availableCrops.forEach(crop => {
+        allCrops.forEach(crop => {
             const button = document.createElement('button');
             button.className = 'crop-btn';
             button.dataset.crop = crop.id;
@@ -224,17 +224,37 @@ class VoiceFarmGame {
             const canAfford = this.resourceManager.canAfford('money', crop.seedCost);
             const growthTimeDisplay = (crop.growthTime / 1000).toFixed(0);
             
-            button.innerHTML = `
-                ${crop.icon} ${crop.name}<br>
-                <small>💰${crop.seedCost} • ${growthTimeDisplay}s • ${crop.xpReward} XP</small>
+            // Create button content
+            let buttonContent = `
+                <div class="crop-content">
+                    <div class="crop-icon-container">
+                        ${crop.icon}
+                        ${crop.isLocked ? '<div class="lock-overlay">🔒</div>' : ''}
+                    </div>
+                    <div class="crop-name">${crop.name}</div>
+                    <div class="crop-details">
+                        <small>💰${crop.seedCost} • ${growthTimeDisplay}s • ${crop.xpReward} XP</small>
+                    </div>
+                </div>
             `;
             
-            if (!canAfford) {
+            button.innerHTML = buttonContent;
+            
+            if (crop.isLocked) {
+                button.classList.add('locked');
+                button.title = `Unlocks at level ${crop.unlockLevel}`;
+                button.disabled = true;
+            } else if (!canAfford) {
                 button.classList.add('disabled');
                 button.title = `Insufficient funds. Need ${crop.seedCost} coins.`;
             }
             
             button.addEventListener('click', () => {
+                if (crop.isLocked) {
+                    this.addMessage(`${crop.name} unlocks at level ${crop.unlockLevel}! Keep farming to level up!`, 'error');
+                    return;
+                }
+                
                 if (!canAfford) {
                     this.addMessage(`Not enough money to buy ${crop.name} seeds! Need ${crop.seedCost} coins.`, 'error');
                     return;
@@ -249,9 +269,9 @@ class VoiceFarmGame {
             container.appendChild(button);
         });
         
-        // Select wheat by default
+        // Select wheat by default if available and unlocked
         const wheatButton = container.querySelector('[data-crop="wheat"]');
-        if (wheatButton && !wheatButton.classList.contains('disabled')) {
+        if (wheatButton && !wheatButton.classList.contains('disabled') && !wheatButton.classList.contains('locked')) {
             wheatButton.classList.add('selected');
         }
         
@@ -457,6 +477,9 @@ class VoiceFarmGame {
         if (newCrops.length > 0) {
             const cropNames = newCrops.map(crop => crop.name).join(', ');
             this.addMessage(`🌱 New crops unlocked: ${cropNames}!`, 'levelup');
+            
+            // Check for new unlocks and update UI
+            this.checkForNewUnlocks();
             this.createCropButtons();
         }
     }
@@ -465,6 +488,33 @@ class VoiceFarmGame {
         // Message area removed - this is now a no-op
         // Messages are logged to console instead
         console.log(`[${type.toUpperCase()}] ${text}`);
+    }
+    
+    checkForNewUnlocks() {
+        const playerLevel = this.resourceManager.getResource('level');
+        const newlyUnlockedCrops = this.cropManager.getCropsUnlockedAtLevel(playerLevel);
+        
+        if (newlyUnlockedCrops.length > 0) {
+            newlyUnlockedCrops.forEach(crop => {
+                this.addMessage(`🎉 New crop unlocked: ${crop.name}! You can now plant ${crop.name} seeds!`, 'unlock');
+            });
+            
+            // Recreate crop buttons to show newly unlocked crops
+            this.createCropButtons();
+            
+            // Add unlock animation to newly unlocked crops
+            setTimeout(() => {
+                newlyUnlockedCrops.forEach(crop => {
+                    const button = document.querySelector(`[data-crop="${crop.id}"]`);
+                    if (button) {
+                        button.classList.add('newly-unlocked');
+                        setTimeout(() => {
+                            button.classList.remove('newly-unlocked');
+                        }, 3000);
+                    }
+                });
+            }, 100);
+        }
     }
     
     startAdvancedGameLoop() {

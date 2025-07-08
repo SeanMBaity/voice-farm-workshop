@@ -156,6 +156,13 @@ class CropManager {
         );
     }
     
+    getAllCropsWithLockStatus(playerLevel) {
+        return Object.values(this.cropDefinitions).map(crop => ({
+            ...crop,
+            isLocked: crop.unlockLevel > playerLevel
+        }));
+    }
+    
     getCropsByRarity(rarity) {
         return Object.values(this.cropDefinitions).filter(crop => 
             crop.rarity === rarity
