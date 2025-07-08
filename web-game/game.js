@@ -539,7 +539,7 @@ class VoiceFarmGame {
             style.id = 'crop-cursor-style';
             style.textContent = `
                 .farm-plot.empty:hover {
-                    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><text x="16" y="24" text-anchor="middle" font-size="20">${this.selectedCropCursor}</text></svg>') 16 16, auto !important;
+                    cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><text x="24" y="36" text-anchor="middle" font-size="40">${this.selectedCropCursor}</text></svg>') 24 24, auto !important;
                 }
             `;
             document.head.appendChild(style);

@@ -139,8 +139,6 @@ class Plot {
     }
     
     clear() {
-        if (this.state !== 'harvested') return false;
-        
         this.crop = null;
         this.state = 'empty';
         this.updateDisplay();
