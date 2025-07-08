@@ -338,29 +338,6 @@ body {
     transform: translateY(-2px);
 }
 
-.instructions {
-    background: #F0FFF0;
-    padding: 20px;
-    border-radius: 15px;
-    border: 2px solid #90EE90;
-}
-
-.instructions ul {
-    list-style: none;
-    padding: 0;
-}
-
-.instructions li {
-    margin-bottom: 8px;
-    padding-left: 20px;
-    position: relative;
-}
-
-.instructions li:before {
-    content: "🌱";
-    position: absolute;
-    left: 0;
-}
 
 
 /* Responsive Design */
